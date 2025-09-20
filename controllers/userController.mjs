@@ -54,11 +54,88 @@ export const deleteUser = async (req, res) => {
     const user = await User.findById(req.params.id);
     if (user) {
       await User.deleteOne({ _id: req.params.id });
-      res.json({ message: "User removed" });
+      res.json({
+        success: true,
+        message: "User removed",
+      });
     } else {
-      res.status(404).json({ message: "User not found" });
+      res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
     }
   } catch (error) {
-    res.status(500).json({ message: "Failed to delete user" });
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete user",
+      error: error.message,
+    });
+  }
+};
+
+// Update user avatar
+export const updateUserAvatar = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { avatar } = req.body;
+
+    if (!avatar) {
+      return res.status(400).json({
+        success: false,
+        message: "Avatar URL is required",
+      });
+    }
+
+    const user = await User.findById(id).select("-password");
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    user.avatar = avatar;
+    const updatedUser = await user.save();
+
+    res.json({
+      success: true,
+      message: "Avatar updated successfully",
+      data: {
+        id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        avatar: updatedUser.avatar,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to update avatar",
+      error: error.message,
+    });
+  }
+};
+
+// Get current user profile
+export const getProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      data: user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to get profile",
+      error: error.message,
+    });
   }
 };
