@@ -1,5 +1,8 @@
-import express from "express";
 import dotenv from "dotenv";
+// Load environment variables FIRST, before any other imports
+dotenv.config();
+
+import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import connectDB from "./config/db.mjs";
@@ -14,9 +17,6 @@ import { errorHandler } from "./middleware/errorMiddleware.mjs";
 import cartRoutes from "./routes/cartRoutes.mjs";
 import paymentRoute from "./routes/paymentRoutes.mjs";
 import cors from "cors";
-
-// Load environment variables
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
