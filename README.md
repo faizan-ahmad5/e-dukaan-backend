@@ -13,10 +13,13 @@
 
 - JWT-based authentication with bcrypt password hashing
 - Role-based access control (Admin/User)
+- **Email verification system** with automated email sending
+- **Password reset functionality** with secure token validation
 - Rate limiting and request logging
 - Input sanitization and XSS protection
 - CORS and security headers (Helmet)
 - Environment variable protection
+- **Email configuration testing** endpoint
 
 ### 🛍️ E-Dukaan Core Features
 
@@ -24,8 +27,10 @@
 - **Shopping Cart**: Add/remove/update products, persistent cart, coupon support
 - **Order Processing**: Complete order lifecycle, status tracking, order history
 - **Wishlist**: Save favorite products for later
-- **Reviews & Ratings**: Verified purchase reviews with moderation
+- **Reviews & Ratings**: Verified purchase reviews with moderation system
 - **Payment Integration**: Secure Stripe checkout sessions
+- **Image Upload System**: Multi-format image processing with optimization
+- **User Profile Management**: Avatar uploads, address management, profile updates
 
 ### 📊 Advanced Features
 
@@ -35,7 +40,19 @@
 - Order status tracking and notifications
 - Admin dashboard capabilities
 - Comprehensive API validation
+- **Email service integration** with Gmail/SMTP support
+- **Image processing and optimization** with Sharp
+- **Multi-format documentation** (API docs, guides)
 - Multi-language support ready
+
+### 📧 Email Features
+
+- **Automated email verification** for new user registrations
+- **Password reset emails** with secure token links
+- **Welcome emails** for verified users
+- **SMTP configuration** with multiple provider support (Gmail, Outlook, Custom)
+- **Email testing endpoint** for configuration validation
+- **Responsive HTML email templates** with modern design
 
 ---
 
@@ -49,6 +66,9 @@
 | **JWT**                | Authentication tokens            |
 | **Stripe**             | Payment processing               |
 | **Bcryptjs**           | Password hashing                 |
+| **Nodemailer**         | Email service integration        |
+| **Sharp**              | Image processing & optimization  |
+| **Multer**             | File upload middleware           |
 | **Helmet**             | Security headers                 |
 | **Express-rate-limit** | Rate limiting                    |
 
@@ -61,7 +81,9 @@
 ```javascript
 {
   name, email, password, phone, avatar, addresses[],
-  isAdmin, isVerified, status, preferences, lastLogin
+  isAdmin, isEmailVerified, emailVerificationToken, emailVerificationExpires,
+  passwordResetToken, passwordResetExpires, lastLogin, accountStatus,
+  preferences, createdAt, updatedAt
 }
 ```
 
@@ -70,7 +92,9 @@
 ```javascript
 {
   title, description, images[], price, comparePrice, category,
-  brand, sku, stock, tags[], rating, seoFields, status
+  brand, sku, inventory: { inStock, quantity, lowStockThreshold },
+  tags[], rating: { average, count }, seoFields, status,
+  specifications: { weight, dimensions }, createdAt, updatedAt
 }
 ```
 
@@ -78,8 +102,10 @@
 
 ```javascript
 {
-  user, orderNumber, items[], shippingAddress, billingAddress,
-  paymentInfo, pricing, orderStatus, shippingInfo, statusHistory[]
+  user, orderNumber, items[{ product, quantity, price, productSnapshot }],
+  shippingAddress, billingAddress, paymentInfo, pricing,
+  orderStatus, shippingInfo, statusHistory[], deliveredAt,
+  createdAt, updatedAt
 }
 ```
 
@@ -87,11 +113,27 @@
 
 ```javascript
 {
-  user,
-    products[{ product, quantity, priceAtAdd }],
-    couponCode,
-    discountAmount,
-    totalAmount;
+  user, items[{ product, quantity, addedAt }],
+  couponCode, discountAmount, totalAmount,
+  createdAt, updatedAt
+}
+```
+
+### Review Schema
+
+```javascript
+{
+  user, product, rating, title, comment, images[],
+  status, helpful[], moderatorNote, createdAt, updatedAt
+}
+```
+
+### Wishlist Schema
+
+```javascript
+{
+  user, items[{ product, addedAt }],
+  createdAt, updatedAt
 }
 ```
 
@@ -117,12 +159,38 @@ npm install
 Create a `.env` file based on `.env.example`:
 
 ```env
+# Database
 MONGO_URI=your_mongodb_connection_string
+
+# JWT Authentication
 JWT_SECRET=your_super_secret_jwt_key
+
+# Stripe Payment
 STRIPE_SECRET_KEY=your_stripe_secret_key
+STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
+
+# Email Configuration (Gmail Example)
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_app_password_here
+EMAIL_FROM=your_email@gmail.com
+
+# Frontend URLs
+FRONTEND_URL=http://localhost:3000
+FRONTEND_SUCCESS_URL=http://localhost:3000/success
+FRONTEND_CANCEL_URL=http://localhost:3000/cancel
+
+# Server Configuration
 NODE_ENV=development
 PORT=5000
 ```
+
+**📧 Email Setup (Gmail):**
+1. Enable 2-Step Verification in your Google Account
+2. Generate an App Password for your application
+3. Use the App Password (without spaces) in EMAIL_PASS
+4. Update EMAIL_USER and EMAIL_FROM with your Gmail address
 
 ### 4. Run the Server
 
@@ -143,27 +211,38 @@ The server will start at `http://localhost:5000`
 ### 🔐 Authentication Endpoints
 
 ```
-POST /api/auth/register  - Register new user
-POST /api/auth/login     - User login
+POST /api/auth/register           - Register new user
+POST /api/auth/login              - User login
+GET  /api/auth/verify-email/:token - Verify email address
+POST /api/auth/resend-verification - Resend verification email
+POST /api/auth/forgot-password    - Request password reset
+POST /api/auth/reset-password/:token - Reset password with token
+GET  /api/auth/test-email         - Test email configuration
+POST /api/auth/test-email         - Send test email
 ```
 
-### 👥 User Management (Admin Only)
+### 👥 User Management
 
 ```
-GET    /api/users/       - List all users
-GET    /api/users/:id    - Get user by ID
-PUT    /api/users/:id    - Update user
-DELETE /api/users/:id    - Delete user
+GET    /api/users/           - List all users (admin)
+GET    /api/users/:id        - Get user by ID (admin)
+PUT    /api/users/:id        - Update user (admin)
+DELETE /api/users/:id        - Delete user (admin)
+GET    /api/users/profile/me - Get current user profile
+PUT    /api/users/:id/avatar - Update user avatar
 ```
 
 ### 🛍️ Products
 
 ```
-GET    /api/products/        - Get all products (public)
-GET    /api/products/:id     - Get single product
-POST   /api/products/        - Create product (admin)
-PUT    /api/products/:id     - Update product (admin)
-DELETE /api/products/:id     - Delete product (admin)
+GET    /api/products/                - Get all products (public)
+GET    /api/products/:id             - Get single product
+POST   /api/products/                - Create product (admin)
+PUT    /api/products/:id             - Update product (admin)
+DELETE /api/products/:id             - Delete product (admin)
+PUT    /api/products/:id/images      - Update product images (admin)
+POST   /api/products/:id/images      - Add product image (admin)
+DELETE /api/products/:id/images/:url - Remove product image (admin)
 ```
 
 ### 🛒 Shopping Cart (Protected)
@@ -171,6 +250,7 @@ DELETE /api/products/:id     - Delete product (admin)
 ```
 GET    /api/cart/                    - Get user's cart
 POST   /api/cart/add                 - Add product to cart
+PUT    /api/cart/update              - Update cart item quantity
 DELETE /api/cart/remove/:productId   - Remove product from cart
 DELETE /api/cart/clear               - Clear entire cart
 ```
@@ -178,26 +258,50 @@ DELETE /api/cart/clear               - Clear entire cart
 ### 📦 Orders (Protected)
 
 ```
-POST   /api/orders/         - Place new order
-GET    /api/orders/         - Get user's orders
-GET    /api/orders/:id      - Get order details
-PUT    /api/orders/:id      - Update order status (admin)
+POST   /api/orders/            - Place new order
+GET    /api/orders/my-orders   - Get user's orders
+GET    /api/orders/            - Get all orders (admin)
+GET    /api/orders/stats       - Get order statistics (admin)
+GET    /api/orders/:id         - Get order details
+PUT    /api/orders/:id/status  - Update order status (admin)
+PUT    /api/orders/:id/cancel  - Cancel order (user)
 ```
 
 ### ❤️ Wishlist (Protected)
 
 ```
-GET    /api/wishlist/                 - Get user's wishlist
-POST   /api/wishlist/add              - Add to wishlist
-DELETE /api/wishlist/remove/:productId - Remove from wishlist
-DELETE /api/wishlist/clear            - Clear wishlist
+GET    /api/wishlist/                    - Get user's wishlist
+POST   /api/wishlist/add                 - Add to wishlist
+DELETE /api/wishlist/remove/:productId   - Remove from wishlist
+DELETE /api/wishlist/clear               - Clear wishlist
+POST   /api/wishlist/move-to-cart        - Move item to cart
+GET    /api/wishlist/stats               - Get wishlist statistics
+GET    /api/wishlist/check/:productId    - Check if product in wishlist
+POST   /api/wishlist/check-multiple      - Check multiple products
 ```
 
 ### ⭐ Reviews (Protected)
 
 ```
-POST   /api/reviews/                  - Add product review
-GET    /api/reviews/product/:productId - Get product reviews
+POST   /api/reviews/                     - Add product review
+GET    /api/reviews/my-reviews           - Get user's reviews
+GET    /api/reviews/                     - Get all reviews (admin)
+GET    /api/reviews/product/:productId   - Get product reviews (public)
+PUT    /api/reviews/:id                  - Update review
+DELETE /api/reviews/:id                  - Delete review
+PUT    /api/reviews/:id/moderate         - Moderate review (admin)
+POST   /api/reviews/:id/helpful          - Mark review helpful
+```
+
+### 🖼️ Image Upload (Protected)
+
+```
+POST   /api/images/upload/product        - Upload product images
+POST   /api/images/upload/avatar         - Upload user avatar
+POST   /api/images/upload/review         - Upload review images
+DELETE /api/images/delete/:category/:filename - Delete image
+GET    /api/images/info/:category/:filename   - Get image info
+```
 DELETE /api/reviews/:id               - Delete review (admin)
 ```
 
@@ -224,12 +328,22 @@ POST   /api/payment/        - Create Stripe checkout session
 ## 🏗️ Project Structure
 
 ```
+├── config/              # Configuration files
+│   ├── db.mjs          # MongoDB connection setup
+│   └── emailConfig.mjs # Email service configuration
 ├── controllers/         # Route handlers
 │   ├── authController.mjs
 │   ├── userController.mjs
 │   ├── productController.mjs
 │   ├── cartController.mjs
+│   ├── orderController.mjs
+│   ├── reviewController.mjs
+│   ├── wishlistController.mjs
 │   └── paymentController.mjs
+├── docs/               # Documentation
+│   ├── COMPLETE_API_DOCUMENTATION.md
+│   ├── EMAIL_VERIFICATION_GUIDE.md
+│   └── IMAGE_UPLOAD_GUIDE.md
 ├── middleware/          # Custom middleware
 │   ├── authMiddleware.mjs
 │   ├── errorMiddleware.mjs
@@ -239,17 +353,30 @@ POST   /api/payment/        - Create Stripe checkout session
 │   ├── ProductSchema.mjs
 │   ├── CartSchema.mjs
 │   ├── OrderSchema.mjs
-│   └── ReviewSchema.mjs
+│   ├── ReviewSchema.mjs
+│   └── WishlistSchema.mjs
 ├── routes/              # API routes
 │   ├── authRoutes.mjs
 │   ├── userRoutes.mjs
 │   ├── productRoutes.mjs
-│   └── cartRoutes.mjs
-├── config/              # Configuration files
-│   └── db.mjs
+│   ├── cartRoutes.mjs
+│   ├── orderRoutes.mjs
+│   ├── reviewRoutes.mjs
+│   ├── wishlistRoutes.mjs
+│   ├── imageRoutes.mjs
+│   └── paymentRoutes.mjs
+├── uploads/            # File upload directories
+│   ├── avatars/        # User profile pictures
+│   ├── products/       # Product images
+│   └── reviews/        # Review images
+├── utils/              # Utility functions
+│   ├── emailService.mjs    # Email service integration
+│   └── imageProcessor.mjs  # Image processing utilities
 ├── .env.example         # Environment template
+├── .gitignore          # Git ignore rules
 ├── server.mjs           # Main server file
-└── package.json         # Dependencies
+├── package.json         # Dependencies and scripts
+└── README.md           # Project documentation
 ```
 
 ---
@@ -260,9 +387,67 @@ POST   /api/payment/        - Create Stripe checkout session
 
 - `MONGO_URI` - MongoDB connection string
 - `JWT_SECRET` - JWT signing secret
-- `STRIPE_SECRET_KEY` - Stripe API key
+- `STRIPE_SECRET_KEY` - Stripe API secret key
+- `STRIPE_PUBLISHABLE_KEY` - Stripe publishable key
+- `EMAIL_HOST` - SMTP server host (e.g., smtp.gmail.com)
+- `EMAIL_PORT` - SMTP server port (usually 587)
+- `EMAIL_USER` - Email address for sending emails
+- `EMAIL_PASS` - Email password or app password
+- `EMAIL_FROM` - From email address
+- `FRONTEND_URL` - Frontend application URL
+- `FRONTEND_SUCCESS_URL` - Payment success redirect URL
+- `FRONTEND_CANCEL_URL` - Payment cancel redirect URL
 - `NODE_ENV` - Environment (development/production)
 - `PORT` - Server port (default: 5000)
+
+### 📧 Email Service Setup:
+
+**Gmail Configuration:**
+1. Enable 2-Step Verification
+2. Generate App Password
+3. Use App Password in EMAIL_PASS (remove spaces)
+
+**Other Providers:**
+- Outlook: smtp-mail.outlook.com (Port: 587)
+- Yahoo: smtp.mail.yahoo.com (Port: 587)
+- Custom SMTP: Your provider's settings
+
+### 🧪 Testing Email Configuration:
+
+```bash
+# Test email service connection
+GET /api/auth/test-email
+
+# Send test email
+POST /api/auth/test-email
+{
+  "sendTestEmail": true,
+  "testEmail": "recipient@example.com"
+}
+```
+
+---
+
+## 📖 Additional Documentation
+
+### 📋 Complete Guides Available:
+
+- **[Complete API Documentation](docs/COMPLETE_API_DOCUMENTATION.md)** - Comprehensive API reference with examples
+- **[Email Verification Guide](docs/EMAIL_VERIFICATION_GUIDE.md)** - Step-by-step email setup and troubleshooting  
+- **[Image Upload Guide](docs/IMAGE_UPLOAD_GUIDE.md)** - File upload implementation and best practices
+
+### 🔧 Quick Setup Guides:
+
+**Email Service Setup:**
+1. Configure environment variables in `.env`
+2. Test configuration: `GET /api/auth/test-email`
+3. Send test email to verify functionality
+
+**Image Upload Setup:**
+1. Upload directories are auto-created on server start
+2. Supported formats: JPEG, PNG, WebP
+3. Automatic image optimization and resizing
+4. Secure file validation and processing
 
 ---
 
