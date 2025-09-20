@@ -27,6 +27,14 @@ export const createOrder = async (req, res) => {
     const orderItems = [];
 
     for (const item of items) {
+      // Validate product ID format
+      if (!item.product || !item.product.match(/^[0-9a-fA-F]{24}$/)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid product ID format",
+        });
+      }
+
       const product = await Product.findById(item.product);
       if (!product) {
         return res.status(404).json({
@@ -108,13 +116,22 @@ export const getAllOrders = async (req, res) => {
     const filter = {};
     if (status) filter.status = status;
 
+    // Whitelist allowed sort fields to prevent injection
+    const allowedSortFields = [
+      "createdAt",
+      "updatedAt",
+      "totalAmount",
+      "status",
+    ];
+    const sanitizedSort = allowedSortFields.includes(sort) ? sort : "createdAt";
+
     const sortOrder = order === "desc" ? -1 : 1;
     const skip = (page - 1) * limit;
 
     const orders = await Order.find(filter)
       .populate("user", "name email")
       .populate("items.product", "title image price")
-      .sort({ [sort]: sortOrder })
+      .sort({ [sanitizedSort]: sortOrder })
       .skip(skip)
       .limit(Number(limit));
 
@@ -179,6 +196,14 @@ export const getUserOrders = async (req, res) => {
 // Get single order by ID
 export const getOrderById = async (req, res) => {
   try {
+    // Validate order ID format
+    if (!req.params.id || !req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid order ID format",
+      });
+    }
+
     const order = await Order.findById(req.params.id)
       .populate("user", "name email")
       .populate("items.product", "title image price brand category");

@@ -7,6 +7,14 @@ export const addToCart = async (req, res) => {
   const userId = req.user._id;
 
   try {
+    // Validate productId format
+    if (!productId || !productId.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid product ID format",
+      });
+    }
+
     // Check if product exists
     const product = await Product.findById(productId);
     if (!product) {

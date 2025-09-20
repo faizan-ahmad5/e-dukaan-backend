@@ -52,6 +52,14 @@ export const addToWishlist = async (req, res) => {
       });
     }
 
+    // Validate product ID format
+    if (!productId.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid product ID format",
+      });
+    }
+
     // Check if product exists
     const product = await Product.findById(productId);
     if (!product) {
@@ -209,6 +217,14 @@ export const moveToCart = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: "Wishlist not found",
+      });
+    }
+
+    // Validate product ID format
+    if (!productId.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid product ID format",
       });
     }
 

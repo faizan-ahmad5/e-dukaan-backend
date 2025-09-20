@@ -7,10 +7,19 @@ export const createReview = async (req, res) => {
   try {
     const { product, rating, title, comment, images = [] } = req.body;
 
+    // Validate required fields
     if (!product || !rating || !comment) {
       return res.status(400).json({
         success: false,
         message: "Product, rating, and comment are required",
+      });
+    }
+
+    // Validate product ID format
+    if (!product.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid product ID format",
       });
     }
 
@@ -299,13 +308,17 @@ export const getAllReviews = async (req, res) => {
     const filter = {};
     if (status) filter.status = status;
 
+    // Whitelist allowed sort fields to prevent injection
+    const allowedSortFields = ["createdAt", "rating", "updatedAt"];
+    const sanitizedSort = allowedSortFields.includes(sort) ? sort : "createdAt";
+
     const sortOrder = order === "desc" ? -1 : 1;
     const skip = (page - 1) * limit;
 
     const reviews = await Review.find(filter)
       .populate("user", "name email avatar")
       .populate("product", "title image")
-      .sort({ [sort]: sortOrder })
+      .sort({ [sanitizedSort]: sortOrder })
       .skip(skip)
       .limit(Number(limit));
 
