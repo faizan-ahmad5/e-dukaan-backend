@@ -1,7 +1,8 @@
-# AtlasCommerce: Secure E-Commerce Backend API
+# E-Dukaan: Secure E-Commerce Backend API
 
 <div align="center">
-  <h3>A robust, scalable e-commerce backend built with Node.js, Express, MongoDB Atlas, and JWT authentication</h3>
+  <h3>🛒 E-Dukaan - Your Complete E-Commerce Solution</h3>
+  <p>A robust, scalable e-commerce backend built with Node.js, Express, MongoDB Atlas, and JWT authentication</p>
 </div>
 
 ---
@@ -17,7 +18,7 @@
 - CORS and security headers (Helmet)
 - Environment variable protection
 
-### 🛍️ E-Commerce Core Features
+### 🛍️ E-Dukaan Core Features
 
 - **Product Management**: CRUD operations, categories, inventory tracking, SEO fields
 - **Shopping Cart**: Add/remove/update products, persistent cart, coupon support
@@ -28,11 +29,13 @@
 
 ### 📊 Advanced Features
 
-- Product search and filtering
+- Product search and filtering with categories
+- Multi-vendor support ready architecture
 - Inventory management with low stock alerts
 - Order status tracking and notifications
 - Admin dashboard capabilities
 - Comprehensive API validation
+- Multi-language support ready
 
 ---
 
@@ -100,7 +103,7 @@
 
 ```bash
 git clone https://github.com/faizan-ahmad5/jwt-auth-atlas-crud.git
-cd jwt-auth-atlas-crud
+cd e-dukaan-backend
 ```
 
 ### 2. Install Dependencies

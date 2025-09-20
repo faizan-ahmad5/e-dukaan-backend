@@ -1,7 +1,7 @@
 {
-  "name": "atlas-ecommerce-api",
+  "name": "e-dukaan-backend",
   "version": "1.0.0",
-  "description": "A comprehensive e-commerce REST API with JWT authentication, MongoDB Atlas, Stripe payments, and full CRUD operations for products, users, cart, and orders",
+  "description": "E-Dukaan - A robust, scalable e-commerce backend built with Node.js, Express, MongoDB Atlas, and JWT authentication",
   "main": "server.mjs",
   "type": "module",
   "scripts": {

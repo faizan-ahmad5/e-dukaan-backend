@@ -35,6 +35,32 @@ app.use(express.json());
 // MongoDB connection
 connectDB();
 
+// Welcome route
+app.get("/", (req, res) => {
+  res.json({
+    message: "🛒 Welcome to E-Dukaan API",
+    description: "Your Complete E-Commerce Backend Solution",
+    version: "1.0.0",
+    features: [
+      "JWT Authentication",
+      "Product Management", 
+      "Shopping Cart",
+      "Order Processing",
+      "Payment Integration",
+      "Reviews & Ratings",
+      "Wishlist Management"
+    ],
+    endpoints: {
+      auth: "/api/auth",
+      users: "/api/users",
+      products: "/api/products", 
+      cart: "/api/cart",
+      payment: "/api/payment"
+    },
+    documentation: "https://github.com/faizan-ahmad5/jwt-auth-atlas-crud#readme"
+  });
+});
+
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
@@ -45,5 +71,6 @@ app.use("/api/payment", paymentRoute);
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`🛒 E-Dukaan Server running on http://localhost:${PORT}`);
+  console.log(`🚀 E-Commerce Backend API is ready!`);
 });
