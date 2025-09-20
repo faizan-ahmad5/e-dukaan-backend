@@ -1,5 +1,6 @@
-import { User } from "../models/User.mjs";
+import { User } from "../models/UserSchema.mjs";
 
+// Get all users
 export const getUsers = async (req, res) => {
   try {
     const users = await User.find().select("-password"); // Exclude password from response
@@ -9,7 +10,7 @@ export const getUsers = async (req, res) => {
   }
 };
 
-// GET single user by ID
+// Get user by ID
 export const getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select("-password");
@@ -23,7 +24,7 @@ export const getUserById = async (req, res) => {
   }
 };
 
-// UPDATE user by ID
+// Update user by ID
 export const updateUser = async (req, res) => {
   const { name, email } = req.body;
   try {
@@ -47,7 +48,7 @@ export const updateUser = async (req, res) => {
   }
 };
 
-// DELETE user by ID
+// Delete user by ID
 export const deleteUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);

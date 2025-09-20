@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { User } from "../models/User.mjs";
+import { User } from "../models/UserSchema.mjs";
 
 // Generate JWT token
 const generateToken = (id) => {
@@ -39,6 +39,7 @@ export const loginUser = async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
+        isAdmin: user.isAdmin, // Include isAdmin in response
         token: generateToken(user._id),
       });
     } else {
