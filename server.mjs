@@ -1,6 +1,9 @@
-import dotenv from "dotenv";
-// Load environment variables FIRST, before any other imports
-dotenv.config();
+import { validateEnvironment, getConfig } from "./config/environment.mjs";
+import logger, { requestLogger } from "./utils/logger.mjs";
+
+// Validate environment variables FIRST
+validateEnvironment();
+const config = getConfig();
 
 import express from "express";
 import path from "path";
@@ -17,36 +20,61 @@ import { errorHandler } from "./middleware/errorMiddleware.mjs";
 import cartRoutes from "./routes/cartRoutes.mjs";
 import paymentRoute from "./routes/paymentRoutes.mjs";
 import cors from "cors";
+import {
+  securityHeaders,
+  generalRateLimit,
+  authRateLimit,
+  dataSanitization,
+} from "./middleware/securityMiddleware.mjs";
+import {
+  healthCheck,
+  apiDocs,
+  standardizeResponse,
+} from "./utils/apiHelpers.mjs";
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = config.port;
 
 // Get current directory path for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Security middleware (MUST be early in middleware chain)
+app.use(securityHeaders);
+app.use(generalRateLimit);
+app.use(dataSanitization);
+
+// Request logging middleware
+app.use(requestLogger);
+
+// API response standardization
+app.use(standardizeResponse);
+
 // CORS configuration
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "http://localhost:5173",
-      "http://localhost:3001",
-    ],
+    origin: config.cors.origins,
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   })
 );
 
-// Middleware to parse JSON
-app.use(express.json());
+// Middleware to parse JSON with size limit
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 // Serve static files for uploaded images
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // MongoDB connection
 connectDB();
+
+// Health check endpoint
+app.get("/health", healthCheck);
+
+// API documentation endpoint
+app.get("/docs", apiDocs);
 
 // Welcome route
 app.get("/", (req, res) => {
@@ -78,8 +106,8 @@ app.get("/", (req, res) => {
   });
 });
 
-// Routes
-app.use("/api/auth", authRoutes);
+// Routes with specific rate limiting
+app.use("/api/auth", authRateLimit, authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
@@ -92,6 +120,10 @@ app.use("/api/wishlist", wishlistRoutes);
 app.use(errorHandler);
 
 app.listen(PORT, () => {
+  logger.info(`🛒 E-Dukaan Server running on http://localhost:${PORT}`);
+  logger.info(`🚀 E-Commerce Backend API is ready!`);
+  logger.info(`🌍 Environment: ${config.nodeEnv}`);
+
   console.log(`🛒 E-Dukaan Server running on http://localhost:${PORT}`);
   console.log(`🚀 E-Commerce Backend API is ready!`);
 });
