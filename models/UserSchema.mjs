@@ -18,7 +18,8 @@ const userSchema = mongoose.Schema(
       trim: true,
       validate: {
         validator: function (v) {
-          return /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v);
+          // More efficient email regex that avoids catastrophic backtracking
+          return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(v);
         },
         message: "Please provide a valid email address",
       },
