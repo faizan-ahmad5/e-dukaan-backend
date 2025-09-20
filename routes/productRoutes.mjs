@@ -5,6 +5,9 @@ import {
   getProductById,
   updateProduct,
   deleteProduct,
+  updateProductImages,
+  addProductImage,
+  removeProductImage,
 } from "../controllers/productController.mjs";
 import { isAdmin, protect } from "../middleware/authMiddleware.mjs";
 
@@ -24,5 +27,10 @@ router.put("/:id", protect, updateProduct);
 
 // DELETE product by ID
 router.delete("/:id", protect, deleteProduct);
+
+// Image management routes
+router.put("/:id/images", protect, isAdmin, updateProductImages);
+router.post("/:id/images", protect, isAdmin, addProductImage);
+router.delete("/:id/images/:imageUrl", protect, isAdmin, removeProductImage);
 
 export default router;
