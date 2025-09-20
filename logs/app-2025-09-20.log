@@ -1,0 +1,8 @@
+{"timestamp":"2025-09-20T19:48:51.155Z","level":"INFO","message":"🛒 E-Dukaan Server running on http://localhost:5000"}
+{"timestamp":"2025-09-20T19:48:51.157Z","level":"INFO","message":"🚀 E-Commerce Backend API is ready!"}
+{"timestamp":"2025-09-20T19:48:51.158Z","level":"INFO","message":"🌍 Environment: production"}
+{"timestamp":"2025-09-20T19:49:02.330Z","level":"INFO","message":"SIGINT received. Shutting down gracefully..."}
+{"timestamp":"2025-09-20T19:49:03.929Z","level":"INFO","message":"🛒 E-Dukaan Server running on http://localhost:5000"}
+{"timestamp":"2025-09-20T19:49:03.931Z","level":"INFO","message":"🚀 E-Commerce Backend API is ready!"}
+{"timestamp":"2025-09-20T19:49:03.932Z","level":"INFO","message":"🌍 Environment: production"}
+{"timestamp":"2025-09-20T19:49:51.521Z","level":"INFO","message":"SIGINT received. Shutting down gracefully..."}
