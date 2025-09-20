@@ -1,9 +1,15 @@
 import express from "express";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 import connectDB from "./config/db.mjs";
 import authRoutes from "./routes/authRoutes.mjs";
 import userRoutes from "./routes/userRoutes.mjs";
 import productRoutes from "./routes/productRoutes.mjs";
+import imageRoutes from "./routes/imageRoutes.mjs";
+import orderRoutes from "./routes/orderRoutes.mjs";
+import reviewRoutes from "./routes/reviewRoutes.mjs";
+import wishlistRoutes from "./routes/wishlistRoutes.mjs";
 import { errorHandler } from "./middleware/errorMiddleware.mjs";
 import cartRoutes from "./routes/cartRoutes.mjs";
 import paymentRoute from "./routes/paymentRoutes.mjs";
@@ -14,6 +20,10 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Get current directory path for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // CORS configuration
 app.use(
@@ -31,6 +41,9 @@ app.use(
 
 // Middleware to parse JSON
 app.use(express.json());
+
+// Serve static files for uploaded images
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // MongoDB connection
 connectDB();
@@ -56,9 +69,12 @@ app.get("/", (req, res) => {
       products: "/api/products",
       cart: "/api/cart",
       payment: "/api/payment",
+      images: "/api/images",
+      orders: "/api/orders",
+      reviews: "/api/reviews",
+      wishlist: "/api/wishlist",
     },
-    documentation:
-      "https://github.com/faizan-ahmad5/jwt-auth-atlas-crud#readme",
+    documentation: "https://github.com/faizan-ahmad5/e-dukaan-backend#readme",
   });
 });
 
@@ -68,6 +84,10 @@ app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/payment", paymentRoute);
+app.use("/api/images", imageRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/reviews", reviewRoutes);
+app.use("/api/wishlist", wishlistRoutes);
 // Error handling middleware
 app.use(errorHandler);
 
