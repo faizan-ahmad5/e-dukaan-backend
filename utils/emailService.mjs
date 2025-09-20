@@ -61,8 +61,10 @@ class EmailService {
       };
 
       const result = await this.transporter.sendMail(mailOptions);
+      // Sanitize user.email to prevent format string vulnerabilities
+      const sanitizedEmail = user.email.replace(/%(s|d|j|%)/g, "%%$1");
       console.log(
-        `Verification email sent to ${user.email}:`,
+        `Verification email sent to ${sanitizedEmail}:`,
         result.messageId
       );
 

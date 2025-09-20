@@ -72,7 +72,15 @@ class Logger {
     const reset = "\x1b[0m";
 
     if (process.env.NODE_ENV !== "test") {
-      console.log(`${colors[level]}[${level}]${reset} ${message}`, meta);
+      // Sanitize message to prevent format string vulnerabilities
+      const sanitizedMessage =
+        typeof message === "string"
+          ? message.replace(/%(s|d|j|%)/g, "%%$1")
+          : String(message);
+      console.log(
+        `${colors[level]}[${level}]${reset} ${sanitizedMessage}`,
+        meta
+      );
     }
   }
 
