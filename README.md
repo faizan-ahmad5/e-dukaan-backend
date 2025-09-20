@@ -9,6 +9,7 @@
 ## 🚀 Features
 
 ### 🔐 Authentication & Security
+
 - JWT-based authentication with bcrypt password hashing
 - Role-based access control (Admin/User)
 - Rate limiting and request logging
@@ -17,6 +18,7 @@
 - Environment variable protection
 
 ### 🛍️ E-Commerce Core Features
+
 - **Product Management**: CRUD operations, categories, inventory tracking, SEO fields
 - **Shopping Cart**: Add/remove/update products, persistent cart, coupon support
 - **Order Processing**: Complete order lifecycle, status tracking, order history
@@ -24,7 +26,8 @@
 - **Reviews & Ratings**: Verified purchase reviews with moderation
 - **Payment Integration**: Secure Stripe checkout sessions
 
-### 📊 Advanced Features  
+### 📊 Advanced Features
+
 - Product search and filtering
 - Inventory management with low stock alerts
 - Order status tracking and notifications
@@ -35,38 +38,41 @@
 
 ## 🛠️ Tech Stack
 
-| Technology | Purpose |
-|------------|---------|
-| **Node.js** | Runtime environment (ES Modules) |
-| **Express.js** | Web framework |
-| **MongoDB Atlas** | Database (Mongoose ODM) |
-| **JWT** | Authentication tokens |
-| **Stripe** | Payment processing |
-| **Bcryptjs** | Password hashing |
-| **Helmet** | Security headers |
-| **Express-rate-limit** | Rate limiting |
+| Technology             | Purpose                          |
+| ---------------------- | -------------------------------- |
+| **Node.js**            | Runtime environment (ES Modules) |
+| **Express.js**         | Web framework                    |
+| **MongoDB Atlas**      | Database (Mongoose ODM)          |
+| **JWT**                | Authentication tokens            |
+| **Stripe**             | Payment processing               |
+| **Bcryptjs**           | Password hashing                 |
+| **Helmet**             | Security headers                 |
+| **Express-rate-limit** | Rate limiting                    |
 
 ---
 
 ## 📁 Database Schemas
 
 ### User Schema
+
 ```javascript
 {
-  name, email, password, phone, avatar, addresses[], 
+  name, email, password, phone, avatar, addresses[],
   isAdmin, isVerified, status, preferences, lastLogin
 }
 ```
 
-### Product Schema  
+### Product Schema
+
 ```javascript
 {
-  title, description, images[], price, comparePrice, category, 
+  title, description, images[], price, comparePrice, category,
   brand, sku, stock, tags[], rating, seoFields, status
 }
 ```
 
 ### Order Schema
+
 ```javascript
 {
   user, orderNumber, items[], shippingAddress, billingAddress,
@@ -75,10 +81,14 @@
 ```
 
 ### Cart Schema
+
 ```javascript
 {
-  user, products[{product, quantity, priceAtAdd}], 
-  couponCode, discountAmount, totalAmount
+  user,
+    products[{ product, quantity, priceAtAdd }],
+    couponCode,
+    discountAmount,
+    totalAmount;
 }
 ```
 
@@ -87,18 +97,22 @@
 ## 🚦 Getting Started
 
 ### 1. Clone Repository
+
 ```bash
 git clone https://github.com/faizan-ahmad5/jwt-auth-atlas-crud.git
 cd jwt-auth-atlas-crud
 ```
 
 ### 2. Install Dependencies
+
 ```bash
 npm install
 ```
 
 ### 3. Environment Setup
+
 Create a `.env` file based on `.env.example`:
+
 ```env
 MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_super_secret_jwt_key
@@ -108,6 +122,7 @@ PORT=5000
 ```
 
 ### 4. Run the Server
+
 ```bash
 # Development
 npm run dev
@@ -123,12 +138,14 @@ The server will start at `http://localhost:5000`
 ## 📚 API Documentation
 
 ### 🔐 Authentication Endpoints
+
 ```
 POST /api/auth/register  - Register new user
 POST /api/auth/login     - User login
 ```
 
 ### 👥 User Management (Admin Only)
+
 ```
 GET    /api/users/       - List all users
 GET    /api/users/:id    - Get user by ID
@@ -137,6 +154,7 @@ DELETE /api/users/:id    - Delete user
 ```
 
 ### 🛍️ Products
+
 ```
 GET    /api/products/        - Get all products (public)
 GET    /api/products/:id     - Get single product
@@ -146,6 +164,7 @@ DELETE /api/products/:id     - Delete product (admin)
 ```
 
 ### 🛒 Shopping Cart (Protected)
+
 ```
 GET    /api/cart/                    - Get user's cart
 POST   /api/cart/add                 - Add product to cart
@@ -154,6 +173,7 @@ DELETE /api/cart/clear               - Clear entire cart
 ```
 
 ### 📦 Orders (Protected)
+
 ```
 POST   /api/orders/         - Place new order
 GET    /api/orders/         - Get user's orders
@@ -162,6 +182,7 @@ PUT    /api/orders/:id      - Update order status (admin)
 ```
 
 ### ❤️ Wishlist (Protected)
+
 ```
 GET    /api/wishlist/                 - Get user's wishlist
 POST   /api/wishlist/add              - Add to wishlist
@@ -170,6 +191,7 @@ DELETE /api/wishlist/clear            - Clear wishlist
 ```
 
 ### ⭐ Reviews (Protected)
+
 ```
 POST   /api/reviews/                  - Add product review
 GET    /api/reviews/product/:productId - Get product reviews
@@ -177,6 +199,7 @@ DELETE /api/reviews/:id               - Delete review (admin)
 ```
 
 ### 💳 Payment
+
 ```
 POST   /api/payment/        - Create Stripe checkout session
 ```
@@ -231,27 +254,12 @@ POST   /api/payment/        - Create Stripe checkout session
 ## 🚀 Deployment
 
 ### Environment Variables Required:
+
 - `MONGO_URI` - MongoDB connection string
 - `JWT_SECRET` - JWT signing secret
 - `STRIPE_SECRET_KEY` - Stripe API key
 - `NODE_ENV` - Environment (development/production)
 - `PORT` - Server port (default: 5000)
-
-### Production Checklist:
-- [ ] Set `NODE_ENV=production`
-- [ ] Use strong JWT secret
-- [ ] Configure allowed CORS origins  
-- [ ] Set up MongoDB Atlas with IP whitelist
-- [ ] Configure Stripe webhook endpoints
-- [ ] Set up SSL/TLS certificates
-- [ ] Configure reverse proxy (Nginx)
-- [ ] Set up monitoring and logging
-
----
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
@@ -268,9 +276,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 If you have any questions or need help with setup, please open an issue on GitHub.
-
----
-
-<div align="center">
-  <p>Made with ❤️ by <a href="https://github.com/faizan-ahmad5">Faizan Ahmad</a></p>
-</div>
