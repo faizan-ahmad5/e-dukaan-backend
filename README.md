@@ -113,9 +113,13 @@
 
 ```javascript
 {
-  user, items[{ product, quantity, addedAt }],
-  couponCode, discountAmount, totalAmount,
-  createdAt, updatedAt
+  user,
+    items[{ product, quantity, addedAt }],
+    couponCode,
+    discountAmount,
+    totalAmount,
+    createdAt,
+    updatedAt;
 }
 ```
 
@@ -132,8 +136,7 @@
 
 ```javascript
 {
-  user, items[{ product, addedAt }],
-  createdAt, updatedAt
+  user, items[{ product, addedAt }], createdAt, updatedAt;
 }
 ```
 
@@ -187,6 +190,7 @@ PORT=5000
 ```
 
 **📧 Email Setup (Gmail):**
+
 1. Enable 2-Step Verification in your Google Account
 2. Generate an App Password for your application
 3. Use the App Password (without spaces) in EMAIL_PASS
@@ -302,13 +306,17 @@ POST   /api/images/upload/review         - Upload review images
 DELETE /api/images/delete/:category/:filename - Delete image
 GET    /api/images/info/:category/:filename   - Get image info
 ```
-DELETE /api/reviews/:id               - Delete review (admin)
+
+DELETE /api/reviews/:id - Delete review (admin)
+
 ```
 
 ### 💳 Payment
 
 ```
-POST   /api/payment/        - Create Stripe checkout session
+
+POST /api/payment/ - Create Stripe checkout session
+
 ```
 
 ---
@@ -328,56 +336,58 @@ POST   /api/payment/        - Create Stripe checkout session
 ## 🏗️ Project Structure
 
 ```
-├── config/              # Configuration files
-│   ├── db.mjs          # MongoDB connection setup
-│   └── emailConfig.mjs # Email service configuration
-├── controllers/         # Route handlers
-│   ├── authController.mjs
-│   ├── userController.mjs
-│   ├── productController.mjs
-│   ├── cartController.mjs
-│   ├── orderController.mjs
-│   ├── reviewController.mjs
-│   ├── wishlistController.mjs
-│   └── paymentController.mjs
-├── docs/               # Documentation
-│   ├── COMPLETE_API_DOCUMENTATION.md
-│   ├── EMAIL_VERIFICATION_GUIDE.md
-│   └── IMAGE_UPLOAD_GUIDE.md
-├── middleware/          # Custom middleware
-│   ├── authMiddleware.mjs
-│   ├── errorMiddleware.mjs
-│   └── securityMiddleware.mjs
-├── models/              # Database schemas
-│   ├── UserSchema.mjs
-│   ├── ProductSchema.mjs
-│   ├── CartSchema.mjs
-│   ├── OrderSchema.mjs
-│   ├── ReviewSchema.mjs
-│   └── WishlistSchema.mjs
-├── routes/              # API routes
-│   ├── authRoutes.mjs
-│   ├── userRoutes.mjs
-│   ├── productRoutes.mjs
-│   ├── cartRoutes.mjs
-│   ├── orderRoutes.mjs
-│   ├── reviewRoutes.mjs
-│   ├── wishlistRoutes.mjs
-│   ├── imageRoutes.mjs
-│   └── paymentRoutes.mjs
-├── uploads/            # File upload directories
-│   ├── avatars/        # User profile pictures
-│   ├── products/       # Product images
-│   └── reviews/        # Review images
-├── utils/              # Utility functions
-│   ├── emailService.mjs    # Email service integration
-│   └── imageProcessor.mjs  # Image processing utilities
-├── .env.example         # Environment template
-├── .gitignore          # Git ignore rules
-├── server.mjs           # Main server file
-├── package.json         # Dependencies and scripts
-└── README.md           # Project documentation
-```
+
+├── config/ # Configuration files
+│ ├── db.mjs # MongoDB connection setup
+│ └── emailConfig.mjs # Email service configuration
+├── controllers/ # Route handlers
+│ ├── authController.mjs
+│ ├── userController.mjs
+│ ├── productController.mjs
+│ ├── cartController.mjs
+│ ├── orderController.mjs
+│ ├── reviewController.mjs
+│ ├── wishlistController.mjs
+│ └── paymentController.mjs
+├── docs/ # Documentation
+│ ├── COMPLETE_API_DOCUMENTATION.md
+│ ├── EMAIL_VERIFICATION_GUIDE.md
+│ └── IMAGE_UPLOAD_GUIDE.md
+├── middleware/ # Custom middleware
+│ ├── authMiddleware.mjs
+│ ├── errorMiddleware.mjs
+│ └── securityMiddleware.mjs
+├── models/ # Database schemas
+│ ├── UserSchema.mjs
+│ ├── ProductSchema.mjs
+│ ├── CartSchema.mjs
+│ ├── OrderSchema.mjs
+│ ├── ReviewSchema.mjs
+│ └── WishlistSchema.mjs
+├── routes/ # API routes
+│ ├── authRoutes.mjs
+│ ├── userRoutes.mjs
+│ ├── productRoutes.mjs
+│ ├── cartRoutes.mjs
+│ ├── orderRoutes.mjs
+│ ├── reviewRoutes.mjs
+│ ├── wishlistRoutes.mjs
+│ ├── imageRoutes.mjs
+│ └── paymentRoutes.mjs
+├── uploads/ # File upload directories
+│ ├── avatars/ # User profile pictures
+│ ├── products/ # Product images
+│ └── reviews/ # Review images
+├── utils/ # Utility functions
+│ ├── emailService.mjs # Email service integration
+│ └── imageProcessor.mjs # Image processing utilities
+├── .env.example # Environment template
+├── .gitignore # Git ignore rules
+├── server.mjs # Main server file
+├── package.json # Dependencies and scripts
+└── README.md # Project documentation
+
+````
 
 ---
 
@@ -424,7 +434,7 @@ POST /api/auth/test-email
   "sendTestEmail": true,
   "testEmail": "recipient@example.com"
 }
-```
+````
 
 ---
 
@@ -433,17 +443,19 @@ POST /api/auth/test-email
 ### 📋 Complete Guides Available:
 
 - **[Complete API Documentation](docs/COMPLETE_API_DOCUMENTATION.md)** - Comprehensive API reference with examples
-- **[Email Verification Guide](docs/EMAIL_VERIFICATION_GUIDE.md)** - Step-by-step email setup and troubleshooting  
+- **[Email Verification Guide](docs/EMAIL_VERIFICATION_GUIDE.md)** - Step-by-step email setup and troubleshooting
 - **[Image Upload Guide](docs/IMAGE_UPLOAD_GUIDE.md)** - File upload implementation and best practices
 
 ### 🔧 Quick Setup Guides:
 
 **Email Service Setup:**
+
 1. Configure environment variables in `.env`
 2. Test configuration: `GET /api/auth/test-email`
 3. Send test email to verify functionality
 
 **Image Upload Setup:**
+
 1. Upload directories are auto-created on server start
 2. Supported formats: JPEG, PNG, WebP
 3. Automatic image optimization and resizing
