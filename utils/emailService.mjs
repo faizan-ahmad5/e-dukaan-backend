@@ -28,6 +28,96 @@ class EmailService {
     return { token, hashedToken };
   }
 
+  // Send verification email
+  async sendVerificationEmail(user, token) {
+    try {
+      const verificationUrl = `${
+        process.env.BACKEND_URL || "http://localhost:5001"
+      }/api/auth/verify-email/${token}`;
+
+      const mailOptions = {
+        from: {
+          name: "E-Dukaan",
+          address: emailConfig.EMAIL_FROM || emailConfig.EMAIL_USER,
+        },
+        to: user.email,
+        subject: "✅ E-Dukaan - Verify Your Email Address",
+        html: this.getVerificationEmailTemplate(user.name, verificationUrl),
+        text: `
+          Hi ${user.name},
+          
+          Welcome to E-Dukaan! Please verify your email address to complete your registration.
+          
+          Click the link below to verify your email:
+          ${verificationUrl}
+          
+          This link will expire in 24 hours.
+          
+          If you didn't create this account, please ignore this email.
+          
+          Best regards,
+          E-Dukaan Team
+        `,
+      };
+
+      const result = await this.transporter.sendMail(mailOptions);
+      console.log(
+        `Verification email sent to ${user.email}:`,
+        result.messageId
+      );
+
+      return {
+        success: true,
+        messageId: result.messageId,
+      };
+    } catch (error) {
+      console.error("Error sending verification email:", error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  }
+
+  // Send welcome email after verification
+  async sendWelcomeEmail(user) {
+    try {
+      const mailOptions = {
+        from: {
+          name: "E-Dukaan",
+          address: emailConfig.EMAIL_FROM || emailConfig.EMAIL_USER,
+        },
+        to: user.email,
+        subject: "🎉 Welcome to E-Dukaan!",
+        html: this.getWelcomeEmailTemplate(user.name),
+        text: `
+          Hi ${user.name},
+          
+          Welcome to E-Dukaan! Your email has been successfully verified.
+          
+          You can now start shopping and enjoy our amazing products.
+          
+          Happy shopping!
+          E-Dukaan Team
+        `,
+      };
+
+      const result = await this.transporter.sendMail(mailOptions);
+      console.log(`Welcome email sent to ${user.email}:`, result.messageId);
+
+      return {
+        success: true,
+        messageId: result.messageId,
+      };
+    } catch (error) {
+      console.error("Error sending welcome email:", error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  }
+
   // Send password reset email
   async sendPasswordResetEmail(user, token) {
     try {
@@ -77,6 +167,87 @@ class EmailService {
         error: error.message,
       };
     }
+  }
+
+  // Email template for verification
+  getVerificationEmailTemplate(userName, verificationUrl) {
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Verify Your E-Dukaan Account</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-align: center; padding: 30px 20px; border-radius: 10px 10px 0 0; }
+          .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px; }
+          .button { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-weight: bold; margin: 20px 0; }
+          .footer { text-align: center; color: #666; font-size: 14px; margin-top: 20px; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>✅ Email Verification</h1>
+          <p>Verify your E-Dukaan account</p>
+        </div>
+        <div class="content">
+          <h2>Hi ${userName}!</h2>
+          <p>Welcome to E-Dukaan! Please verify your email address to complete your registration.</p>
+          <div style="text-align: center;">
+            <a href="${verificationUrl}" class="button">Verify Email Address</a>
+          </div>
+          <p>Or copy and paste this link in your browser:</p>
+          <p style="word-break: break-all; color: #007bff;">${verificationUrl}</p>
+          <p><strong>This verification link will expire in 24 hours.</strong></p>
+        </div>
+        <div class="footer">
+          <p>© 2024 E-Dukaan. All rights reserved.</p>
+        </div>
+      </body>
+      </html>
+    `;
+  }
+
+  // Email template for welcome
+  getWelcomeEmailTemplate(userName) {
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Welcome to E-Dukaan!</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; text-align: center; padding: 30px 20px; border-radius: 10px 10px 0 0; }
+          .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px; }
+          .footer { text-align: center; color: #666; font-size: 14px; margin-top: 20px; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>🎉 Welcome to E-Dukaan!</h1>
+          <p>Your account is now verified and ready</p>
+        </div>
+        <div class="content">
+          <h2>Hi ${userName}!</h2>
+          <p>Congratulations! Your email has been successfully verified and your E-Dukaan account is now active.</p>
+          <p>You can now:</p>
+          <ul>
+            <li>🛍️ Browse our amazing product catalog</li>
+            <li>🛒 Add items to your cart</li>
+            <li>❤️ Create your wishlist</li>
+            <li>📦 Track your orders</li>
+          </ul>
+          <p>Happy shopping!</p>
+        </div>
+        <div class="footer">
+          <p>© 2024 E-Dukaan. All rights reserved.</p>
+        </div>
+      </body>
+      </html>
+    `;
   }
 
   // Email template for password reset
