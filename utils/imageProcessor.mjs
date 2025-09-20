@@ -285,9 +285,21 @@ export const processUploadedImage = async (req, res, next) => {
       );
 
       if (optimization.success) {
-        // Replace original with optimized
-        fs.unlinkSync(file.path);
-        fs.renameSync(optimizedPath, file.path);
+        // Validate paths are safe before file operations
+        const safePath = path.resolve(file.path);
+        const safeOptimizedPath = path.resolve(optimizedPath);
+        const uploadsDir = path.resolve(process.cwd(), "uploads");
+
+        if (
+          safePath.startsWith(uploadsDir) &&
+          safeOptimizedPath.startsWith(uploadsDir)
+        ) {
+          // Replace original with optimized
+          fs.unlinkSync(safePath);
+          fs.renameSync(safeOptimizedPath, safePath);
+        } else {
+          throw new Error("Unsafe file path operation detected");
+        }
       }
 
       processedFiles.push(file);
