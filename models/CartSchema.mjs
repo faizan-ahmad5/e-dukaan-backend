@@ -6,74 +6,83 @@ const cartSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: [true, "Cart must belong to a user"],
-      unique: true // One cart per user
+      unique: true, // One cart per user
     },
     products: [
       {
         product: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Product",
-          required: [true, "Product is required"]
+          required: [true, "Product is required"],
         },
         quantity: {
           type: Number,
           required: [true, "Quantity is required"],
           min: [1, "Quantity must be at least 1"],
-          max: [99, "Quantity cannot exceed 99"]
+          max: [99, "Quantity cannot exceed 99"],
         },
         addedAt: {
           type: Date,
-          default: Date.now
+          default: Date.now,
         },
         // Store price at time of adding to cart for consistency
         priceAtAdd: {
           type: Number,
           required: true,
-          min: [0, "Price cannot be negative"]
-        }
-      }
+          min: [0, "Price cannot be negative"],
+        },
+      },
     ],
     couponCode: {
       type: String,
       uppercase: true,
-      trim: true
+      trim: true,
     },
     discountAmount: {
       type: Number,
       default: 0,
-      min: [0, "Discount cannot be negative"]
+      min: [0, "Discount cannot be negative"],
     },
     totalAmount: {
       type: Number,
       default: 0,
-      min: [0, "Total amount cannot be negative"]
-    }
+      min: [0, "Total amount cannot be negative"],
+    },
   },
   {
     timestamps: true,
     toJSON: { virtuals: true },
-    toObject: { virtuals: true }
+    toObject: { virtuals: true },
   }
 );
 
 // Indexes for better performance
-cartSchema.index({ user: 1 });
-cartSchema.index({ 'products.product': 1 });
+// Note: user already has unique: true, so no need for separate index
+cartSchema.index({ "products.product": 1 });
+cartSchema.index({ "products.addedAt": -1 });
+cartSchema.index({ updatedAt: -1 });
 
 // Virtual for getting total item count
-cartSchema.virtual('itemCount').get(function() {
+cartSchema.virtual("itemCount").get(function () {
   return this.products.reduce((total, item) => total + item.quantity, 0);
 });
 
 // Virtual for getting subtotal (before discounts)
-cartSchema.virtual('subtotal').get(function() {
-  return this.products.reduce((total, item) => total + (item.priceAtAdd * item.quantity), 0);
+cartSchema.virtual("subtotal").get(function () {
+  return this.products.reduce(
+    (total, item) => total + item.priceAtAdd * item.quantity,
+    0
+  );
 });
 
 // Method to add product to cart
-cartSchema.methods.addProduct = async function(productId, quantity, currentPrice) {
-  const existingProductIndex = this.products.findIndex(item => 
-    item.product.toString() === productId.toString()
+cartSchema.methods.addProduct = async function (
+  productId,
+  quantity,
+  currentPrice
+) {
+  const existingProductIndex = this.products.findIndex(
+    (item) => item.product.toString() === productId.toString()
   );
 
   if (existingProductIndex > -1) {
@@ -84,10 +93,10 @@ cartSchema.methods.addProduct = async function(productId, quantity, currentPrice
     }
   } else {
     // Add new product
-    this.products.push({ 
-      product: productId, 
-      quantity, 
-      priceAtAdd: currentPrice 
+    this.products.push({
+      product: productId,
+      quantity,
+      priceAtAdd: currentPrice,
     });
   }
 
@@ -96,9 +105,9 @@ cartSchema.methods.addProduct = async function(productId, quantity, currentPrice
 };
 
 // Method to update product quantity
-cartSchema.methods.updateProductQuantity = function(productId, quantity) {
-  const productIndex = this.products.findIndex(item => 
-    item.product.toString() === productId.toString()
+cartSchema.methods.updateProductQuantity = function (productId, quantity) {
+  const productIndex = this.products.findIndex(
+    (item) => item.product.toString() === productId.toString()
   );
 
   if (productIndex > -1) {
@@ -114,17 +123,17 @@ cartSchema.methods.updateProductQuantity = function(productId, quantity) {
 };
 
 // Method to remove product from cart
-cartSchema.methods.removeProduct = function(productId) {
-  this.products = this.products.filter(item => 
-    item.product.toString() !== productId.toString()
+cartSchema.methods.removeProduct = function (productId) {
+  this.products = this.products.filter(
+    (item) => item.product.toString() !== productId.toString()
   );
-  
+
   this.calculateTotal();
   return this.save();
 };
 
 // Method to clear entire cart
-cartSchema.methods.clear = function() {
+cartSchema.methods.clear = function () {
   this.products = [];
   this.couponCode = undefined;
   this.discountAmount = 0;
@@ -133,7 +142,7 @@ cartSchema.methods.clear = function() {
 };
 
 // Method to apply coupon
-cartSchema.methods.applyCoupon = function(couponCode, discountAmount) {
+cartSchema.methods.applyCoupon = function (couponCode, discountAmount) {
   this.couponCode = couponCode;
   this.discountAmount = discountAmount;
   this.calculateTotal();
@@ -141,13 +150,13 @@ cartSchema.methods.applyCoupon = function(couponCode, discountAmount) {
 };
 
 // Method to calculate total amount
-cartSchema.methods.calculateTotal = function() {
+cartSchema.methods.calculateTotal = function () {
   const subtotal = this.subtotal;
   this.totalAmount = Math.max(0, subtotal - this.discountAmount);
 };
 
 // Pre-save middleware to calculate total
-cartSchema.pre('save', function(next) {
+cartSchema.pre("save", function (next) {
   this.calculateTotal();
   next();
 });

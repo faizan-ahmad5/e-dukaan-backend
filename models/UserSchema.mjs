@@ -125,10 +125,13 @@ const userSchema = mongoose.Schema(
   }
 );
 
-// Index for better query performance
-userSchema.index({ email: 1 });
+// Indexes for better query performance
+// Note: email already has unique: true, so no need for separate index
 userSchema.index({ status: 1 });
 userSchema.index({ isAdmin: 1 });
+userSchema.index({ createdAt: -1 });
+userSchema.index({ verificationToken: 1 });
+userSchema.index({ resetPasswordToken: 1 });
 
 // Hash password before saving
 userSchema.pre("save", async function (next) {
