@@ -1,11 +1,48 @@
 {
+  "name": "atlas-ecommerce-api",
+  "version": "1.0.0",
+  "description": "A comprehensive e-commerce REST API with JWT authentication, MongoDB Atlas, Stripe payments, and full CRUD operations for products, users, cart, and orders",
+  "main": "server.mjs",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "nodemon server.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ecommerce",
+    "nodejs",
+    "express",
+    "mongodb",
+    "jwt",
+    "authentication",
+    "stripe",
+    "rest-api",
+    "atlas",
+    "crud",
+    "shopping-cart",
+    "payments"
+  ],
+  "author": "Faizan Ahmad",
+  "license": "MIT",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^7.1.5",
+    "express-validator": "^7.0.1",
+    "helmet": "^7.1.0",
+    "hpp": "^0.2.3",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.7.3",
-    "stripe": "^17.4.0"
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.8",
+    "stripe": "^17.4.0",
+    "xss-clean": "^0.1.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
   }
 }
