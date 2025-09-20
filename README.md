@@ -1,6 +1,6 @@
 # E-Dukaan: Secure E-Commerce Backend API
 
-<div align="center">
+<div>
   <h3>🛒 E-Dukaan - Your Complete E-Commerce Solution</h3>
   <p>A robust, scalable e-commerce backend built with Node.js, Express, MongoDB Atlas, and JWT authentication</p>
 </div>
