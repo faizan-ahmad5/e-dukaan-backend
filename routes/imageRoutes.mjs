@@ -77,9 +77,21 @@ router.post(
         });
       }
 
-      const imageUrls = req.files.map((file) =>
-        generateImageUrl(req, "products", file.filename)
-      );
+      // Validate req.files is an array and has proper structure
+      if (!Array.isArray(req.files)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid file upload data",
+        });
+      }
+
+      const imageUrls = req.files.map((file) => {
+        // Validate file object structure
+        if (!file || typeof file.filename !== "string") {
+          throw new Error("Invalid file object structure");
+        }
+        return generateImageUrl(req, "products", file.filename);
+      });
 
       res.status(200).json({
         success: true,
@@ -149,9 +161,21 @@ router.post(
         });
       }
 
-      const imageUrls = req.files.map((file) =>
-        generateImageUrl(req, "reviews", file.filename)
-      );
+      // Validate req.files is an array and has proper structure
+      if (!Array.isArray(req.files)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid file upload data",
+        });
+      }
+
+      const imageUrls = req.files.map((file) => {
+        // Validate file object structure
+        if (!file || typeof file.filename !== "string") {
+          throw new Error("Invalid file object structure");
+        }
+        return generateImageUrl(req, "reviews", file.filename);
+      });
 
       res.status(200).json({
         success: true,
@@ -177,6 +201,7 @@ router.delete("/delete/:category/:filename", protect, async (req, res) => {
     const { category, filename } = req.params;
     const allowedCategories = ["products", "avatars", "reviews"];
 
+    // Validate category
     if (!allowedCategories.includes(category)) {
       return res.status(400).json({
         success: false,
@@ -184,7 +209,34 @@ router.delete("/delete/:category/:filename", protect, async (req, res) => {
       });
     }
 
-    const filePath = path.join(__dirname, `../uploads/${category}/${filename}`);
+    // Sanitize filename to prevent path traversal
+    const sanitizedFilename = path.basename(filename);
+    if (
+      sanitizedFilename !== filename ||
+      filename.includes("..") ||
+      filename.includes("/") ||
+      filename.includes("\\")
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid filename",
+      });
+    }
+
+    const filePath = path.join(
+      __dirname,
+      `../uploads/${category}/${sanitizedFilename}`
+    );
+
+    // Ensure the resolved path is within the uploads directory
+    const uploadsDir = path.resolve(__dirname, "../uploads");
+    const resolvedPath = path.resolve(filePath);
+    if (!resolvedPath.startsWith(uploadsDir)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid file path",
+      });
+    }
 
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
@@ -211,16 +263,53 @@ router.delete("/delete/:category/:filename", protect, async (req, res) => {
 router.get("/info/:category/:filename", (req, res) => {
   try {
     const { category, filename } = req.params;
-    const filePath = path.join(__dirname, `../uploads/${category}/${filename}`);
+
+    // Validate category
+    const allowedCategories = ["products", "avatars", "reviews"];
+    if (!allowedCategories.includes(category)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid image category",
+      });
+    }
+
+    // Sanitize filename to prevent path traversal
+    const sanitizedFilename = path.basename(filename);
+    if (
+      sanitizedFilename !== filename ||
+      filename.includes("..") ||
+      filename.includes("/") ||
+      filename.includes("\\")
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid filename",
+      });
+    }
+
+    const filePath = path.join(
+      __dirname,
+      `../uploads/${category}/${sanitizedFilename}`
+    );
+
+    // Ensure the resolved path is within the uploads directory
+    const uploadsDir = path.resolve(__dirname, "../uploads");
+    const resolvedPath = path.resolve(filePath);
+    if (!resolvedPath.startsWith(uploadsDir)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid file path",
+      });
+    }
 
     if (fs.existsSync(filePath)) {
       const stats = fs.statSync(filePath);
-      const imageUrl = generateImageUrl(req, category, filename);
+      const imageUrl = generateImageUrl(req, category, sanitizedFilename);
 
       res.status(200).json({
         success: true,
         data: {
-          filename,
+          filename: sanitizedFilename,
           category,
           url: imageUrl,
           size: stats.size,
