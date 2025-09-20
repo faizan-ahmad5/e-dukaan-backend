@@ -43,21 +43,22 @@ app.get("/", (req, res) => {
     version: "1.0.0",
     features: [
       "JWT Authentication",
-      "Product Management", 
+      "Product Management",
       "Shopping Cart",
       "Order Processing",
       "Payment Integration",
       "Reviews & Ratings",
-      "Wishlist Management"
+      "Wishlist Management",
     ],
     endpoints: {
       auth: "/api/auth",
       users: "/api/users",
-      products: "/api/products", 
+      products: "/api/products",
       cart: "/api/cart",
-      payment: "/api/payment"
+      payment: "/api/payment",
     },
-    documentation: "https://github.com/faizan-ahmad5/jwt-auth-atlas-crud#readme"
+    documentation:
+      "https://github.com/faizan-ahmad5/jwt-auth-atlas-crud#readme",
   });
 });
 
