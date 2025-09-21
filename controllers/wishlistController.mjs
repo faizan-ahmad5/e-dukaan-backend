@@ -69,6 +69,14 @@ export const addToWishlist = async (req, res) => {
       });
     }
 
+    // Validate user ID format
+    if (!req.user.id || !req.user.id.toString().match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user session",
+      });
+    }
+
     let wishlist = await Wishlist.findOne({ user: req.user.id });
 
     if (!wishlist) {

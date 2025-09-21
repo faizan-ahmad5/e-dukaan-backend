@@ -33,6 +33,14 @@ export const createReview = async (req, res) => {
     }
 
     // Check if user has purchased this product
+    // Validate user ID format
+    if (!req.user.id || !req.user.id.toString().match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user session",
+      });
+    }
+
     const userOrder = await Order.findOne({
       user: req.user.id,
       "items.product": product,
@@ -432,6 +440,11 @@ export const markReviewHelpful = async (req, res) => {
 // Helper function to update product rating
 const updateProductRating = async (productId) => {
   try {
+    // Validate productId format
+    if (!productId || !productId.toString().match(/^[0-9a-fA-F]{24}$/)) {
+      throw new Error("Invalid product ID format");
+    }
+
     const ratingStats = await Review.aggregate([
       { $match: { product: productId, status: "approved" } },
       {

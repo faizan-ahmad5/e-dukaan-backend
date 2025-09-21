@@ -105,7 +105,9 @@ class EmailService {
       };
 
       const result = await this.transporter.sendMail(mailOptions);
-      console.log(`Welcome email sent to ${user.email}:`, result.messageId);
+      // Sanitize user.email to prevent format string vulnerabilities
+      const sanitizedEmail = user.email.replace(/%(s|d|j|%)/g, "%%$1");
+      console.log(`Welcome email sent to ${sanitizedEmail}:`, result.messageId);
 
       return {
         success: true,
@@ -153,8 +155,10 @@ class EmailService {
       };
 
       const result = await this.transporter.sendMail(mailOptions);
+      // Sanitize user.email to prevent format string vulnerabilities
+      const sanitizedEmail = user.email.replace(/%(s|d|j|%)/g, "%%$1");
       console.log(
-        `Password reset email sent to ${user.email}:`,
+        `Password reset email sent to ${sanitizedEmail}:`,
         result.messageId
       );
 

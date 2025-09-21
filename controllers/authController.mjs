@@ -90,7 +90,16 @@ export const testEmailConfig = async (req, res) => {
 export const registerUser = async (req, res) => {
   const { name, email, password } = req.body;
   try {
-    const existingUser = await User.findOne({ email });
+    // Sanitize email input to prevent injection
+    const sanitizedEmail = email?.toLowerCase()?.trim();
+    if (!sanitizedEmail) {
+      return res.status(400).json({
+        success: false,
+        message: "Valid email is required",
+      });
+    }
+
+    const existingUser = await User.findOne({ email: sanitizedEmail });
     if (existingUser) {
       return res.status(400).json({
         success: false,
@@ -153,7 +162,16 @@ export const registerUser = async (req, res) => {
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
-    const user = await User.findOne({ email });
+    // Sanitize email input to prevent injection
+    const sanitizedEmail = email?.toLowerCase()?.trim();
+    if (!sanitizedEmail) {
+      return res.status(400).json({
+        success: false,
+        message: "Valid email is required",
+      });
+    }
+
+    const user = await User.findOne({ email: sanitizedEmail });
 
     if (!user) {
       return res.status(401).json({
@@ -268,7 +286,16 @@ export const resendVerificationEmail = async (req, res) => {
   try {
     const { email } = req.body;
 
-    const user = await User.findOne({ email });
+    // Sanitize email input to prevent injection
+    const sanitizedEmail = email?.toLowerCase()?.trim();
+    if (!sanitizedEmail) {
+      return res.status(400).json({
+        success: false,
+        message: "Valid email is required",
+      });
+    }
+
+    const user = await User.findOne({ email: sanitizedEmail });
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -325,7 +352,16 @@ export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
 
-    const user = await User.findOne({ email });
+    // Sanitize email input to prevent injection
+    const sanitizedEmail = email?.toLowerCase()?.trim();
+    if (!sanitizedEmail) {
+      return res.status(400).json({
+        success: false,
+        message: "Valid email is required",
+      });
+    }
+
+    const user = await User.findOne({ email: sanitizedEmail });
     if (!user) {
       return res.status(404).json({
         success: false,
