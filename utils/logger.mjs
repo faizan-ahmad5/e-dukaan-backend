@@ -72,15 +72,11 @@ class Logger {
     const reset = "\x1b[0m";
 
     if (process.env.NODE_ENV !== "test") {
-      // Sanitize message to prevent format string vulnerabilities
+      // Use array join to avoid format string vulnerabilities
+      const prefix = colors[level] + "[" + level + "]" + reset + " ";
       const sanitizedMessage =
-        typeof message === "string"
-          ? message.replace(/%(s|d|j|%)/g, "%%$1")
-          : String(message);
-      console.log(
-        `${colors[level]}[${level}]${reset} ${sanitizedMessage}`,
-        meta
-      );
+        typeof message === "string" ? message : String(message);
+      console.log(prefix + sanitizedMessage, meta);
     }
   }
 

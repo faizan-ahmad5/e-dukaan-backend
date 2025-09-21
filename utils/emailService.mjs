@@ -61,10 +61,10 @@ class EmailService {
       };
 
       const result = await this.transporter.sendMail(mailOptions);
-      // Sanitize user.email to prevent format string vulnerabilities
+      // Avoid template literals with user data to prevent format string vulnerabilities
       const sanitizedEmail = user.email.replace(/%(s|d|j|%)/g, "%%$1");
       console.log(
-        `Verification email sent to ${sanitizedEmail}:`,
+        "Verification email sent to " + sanitizedEmail + ":",
         result.messageId
       );
 
@@ -105,9 +105,12 @@ class EmailService {
       };
 
       const result = await this.transporter.sendMail(mailOptions);
-      // Sanitize user.email to prevent format string vulnerabilities
+      // Avoid template literals with user data to prevent format string vulnerabilities
       const sanitizedEmail = user.email.replace(/%(s|d|j|%)/g, "%%$1");
-      console.log(`Welcome email sent to ${sanitizedEmail}:`, result.messageId);
+      console.log(
+        "Welcome email sent to " + sanitizedEmail + ":",
+        result.messageId
+      );
 
       return {
         success: true,
