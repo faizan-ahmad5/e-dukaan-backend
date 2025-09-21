@@ -1,5 +1,6 @@
 import { Cart } from "../models/CartSchema.mjs";
 import { Product } from "../models/ProductSchema.mjs";
+import mongoose from "mongoose";
 
 // Add product to cart
 export const addToCart = async (req, res) => {
@@ -30,7 +31,9 @@ export const addToCart = async (req, res) => {
     }
 
     // Check if user already has a cart
-    let cart = await Cart.findOne({ userId });
+    // Convert userId to ObjectId to prevent NoSQL injection
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+    let cart = await Cart.findOne({ userId: userObjectId });
 
     if (cart) {
       // Check if product already exists in cart
@@ -71,7 +74,19 @@ export const getCart = async (req, res) => {
   const userId = req.user._id;
 
   try {
-    const cart = await Cart.findOne({ userId }).populate("products.productId");
+    // Validate userId format
+    if (!userId || !userId.toString().match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user session",
+      });
+    }
+
+    // Convert userId to ObjectId to prevent NoSQL injection
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+    const cart = await Cart.findOne({ userId: userObjectId }).populate(
+      "products.productId"
+    );
 
     if (!cart) {
       return res.status(200).json({ products: [] });
@@ -90,7 +105,25 @@ export const removeFromCart = async (req, res) => {
   const userId = req.user._id;
 
   try {
-    const cart = await Cart.findOne({ userId });
+    // Validate userId format
+    if (!userId || !userId.toString().match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user session",
+      });
+    }
+
+    // Validate productId format
+    if (!productId || !productId.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid product ID format",
+      });
+    }
+
+    // Convert userId to ObjectId to prevent NoSQL injection
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+    const cart = await Cart.findOne({ userId: userObjectId });
 
     if (!cart) {
       return res.status(404).json({ message: "Cart not found" });
@@ -118,7 +151,17 @@ export const clearCart = async (req, res) => {
   const userId = req.user._id;
 
   try {
-    await Cart.findOneAndDelete({ userId });
+    // Validate userId format
+    if (!userId || !userId.toString().match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user session",
+      });
+    }
+
+    // Convert userId to ObjectId to prevent NoSQL injection
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+    await Cart.findOneAndDelete({ userId: userObjectId });
 
     res.status(200).json({ message: "Cart cleared successfully" });
   } catch (error) {
