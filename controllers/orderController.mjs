@@ -1,6 +1,7 @@
 import { Order } from "../models/OrderSchema.mjs";
 import { Product } from "../models/ProductSchema.mjs";
 import { User } from "../models/UserSchema.mjs";
+import mongoose from "mongoose";
 
 // Create a new order
 export const createOrder = async (req, res) => {
@@ -35,7 +36,9 @@ export const createOrder = async (req, res) => {
         });
       }
 
-      const product = await Product.findById(item.product);
+      const product = await Product.findById(
+        new mongoose.Types.ObjectId(item.product)
+      );
       if (!product) {
         return res.status(404).json({
           success: false,
@@ -170,7 +173,7 @@ export const getUserOrders = async (req, res) => {
       });
     }
 
-    const filter = { user: req.user.id };
+    const filter = { user: new mongoose.Types.ObjectId(req.user.id) };
     if (status) filter.status = status;
 
     const skip = (page - 1) * limit;
@@ -212,7 +215,9 @@ export const getOrderById = async (req, res) => {
       });
     }
 
-    const order = await Order.findById(req.params.id)
+    const order = await Order.findById(
+      new mongoose.Types.ObjectId(req.params.id)
+    )
       .populate("user", "name email")
       .populate("items.product", "title image price brand category");
 
@@ -266,7 +271,9 @@ export const updateOrderStatus = async (req, res) => {
       });
     }
 
-    const order = await Order.findById(req.params.id);
+    const order = await Order.findById(
+      new mongoose.Types.ObjectId(req.params.id)
+    );
 
     if (!order) {
       return res.status(404).json({
@@ -308,7 +315,9 @@ export const updateOrderStatus = async (req, res) => {
 // Cancel order
 export const cancelOrder = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id);
+    const order = await Order.findById(
+      new mongoose.Types.ObjectId(req.params.id)
+    );
 
     if (!order) {
       return res.status(404).json({
@@ -335,7 +344,9 @@ export const cancelOrder = async (req, res) => {
 
     // Restore product inventory
     for (const item of order.items) {
-      const product = await Product.findById(item.product);
+      const product = await Product.findById(
+        new mongoose.Types.ObjectId(item.product)
+      );
       if (product) {
         product.inventory.quantity += item.quantity;
         product.inventory.inStock = true;
