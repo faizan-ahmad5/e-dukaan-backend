@@ -1,6 +1,7 @@
 import { Review } from "../models/ReviewSchema.mjs";
 import { Product } from "../models/ProductSchema.mjs";
 import { Order } from "../models/OrderSchema.mjs";
+import mongoose from "mongoose";
 
 // Create a new review
 export const createReview = async (req, res) => {
@@ -24,7 +25,9 @@ export const createReview = async (req, res) => {
     }
 
     // Check if product exists
-    const productExists = await Product.findById(product);
+    const productExists = await Product.findById(
+      new mongoose.Types.ObjectId(product)
+    );
     if (!productExists) {
       return res.status(404).json({
         success: false,
@@ -42,8 +45,8 @@ export const createReview = async (req, res) => {
     }
 
     const userOrder = await Order.findOne({
-      user: req.user.id,
-      "items.product": product,
+      user: new mongoose.Types.ObjectId(req.user.id),
+      "items.product": new mongoose.Types.ObjectId(product),
       status: "delivered",
     });
 
@@ -56,8 +59,8 @@ export const createReview = async (req, res) => {
 
     // Check if user has already reviewed this product
     const existingReview = await Review.findOne({
-      user: req.user.id,
-      product: product,
+      user: new mongoose.Types.ObjectId(req.user.id),
+      product: new mongoose.Types.ObjectId(product),
     });
 
     if (existingReview) {
@@ -185,13 +188,17 @@ export const getUserReviews = async (req, res) => {
     const { page = 1, limit = 10 } = req.query;
     const skip = (page - 1) * limit;
 
-    const reviews = await Review.find({ user: req.user.id })
+    const reviews = await Review.find({
+      user: new mongoose.Types.ObjectId(req.user.id),
+    })
       .populate("product", "title image price")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(Number(limit));
 
-    const total = await Review.countDocuments({ user: req.user.id });
+    const total = await Review.countDocuments({
+      user: new mongoose.Types.ObjectId(req.user.id),
+    });
 
     res.json({
       success: true,
@@ -216,7 +223,9 @@ export const updateReview = async (req, res) => {
   try {
     const { rating, title, comment, images } = req.body;
 
-    const review = await Review.findById(req.params.id);
+    const review = await Review.findById(
+      new mongoose.Types.ObjectId(req.params.id)
+    );
 
     if (!review) {
       return res.status(404).json({
@@ -266,7 +275,9 @@ export const updateReview = async (req, res) => {
 // Delete a review
 export const deleteReview = async (req, res) => {
   try {
-    const review = await Review.findById(req.params.id);
+    const review = await Review.findById(
+      new mongoose.Types.ObjectId(req.params.id)
+    );
 
     if (!review) {
       return res.status(404).json({
@@ -284,7 +295,7 @@ export const deleteReview = async (req, res) => {
     }
 
     const productId = review.product;
-    await Review.findByIdAndDelete(req.params.id);
+    await Review.findByIdAndDelete(new mongoose.Types.ObjectId(req.params.id));
 
     // Update product rating
     await updateProductRating(productId);
@@ -363,7 +374,9 @@ export const moderateReview = async (req, res) => {
       });
     }
 
-    const review = await Review.findById(req.params.id);
+    const review = await Review.findById(
+      new mongoose.Types.ObjectId(req.params.id)
+    );
 
     if (!review) {
       return res.status(404).json({
@@ -401,7 +414,9 @@ export const moderateReview = async (req, res) => {
 // Mark review as helpful
 export const markReviewHelpful = async (req, res) => {
   try {
-    const review = await Review.findById(req.params.id);
+    const review = await Review.findById(
+      new mongoose.Types.ObjectId(req.params.id)
+    );
 
     if (!review) {
       return res.status(404).json({
@@ -456,7 +471,9 @@ const updateProductRating = async (productId) => {
       },
     ]);
 
-    const product = await Product.findById(productId);
+    const product = await Product.findById(
+      new mongoose.Types.ObjectId(productId)
+    );
     if (product && ratingStats.length > 0) {
       product.rating.average =
         Math.round(ratingStats[0].averageRating * 10) / 10;
