@@ -1,10 +1,13 @@
 import { Wishlist } from "../models/WishlistSchema.mjs";
 import { Product } from "../models/ProductSchema.mjs";
+import mongoose from "mongoose";
 
 // Get user's wishlist
 export const getWishlist = async (req, res) => {
   try {
-    const wishlist = await Wishlist.findOne({ user: req.user.id })
+    const wishlist = await Wishlist.findOne({
+      user: new mongoose.Types.ObjectId(req.user.id),
+    })
       .populate({
         path: "items.product",
         select: "title image price brand category inventory rating",
@@ -61,7 +64,9 @@ export const addToWishlist = async (req, res) => {
     }
 
     // Check if product exists
-    const product = await Product.findById(productId);
+    const product = await Product.findById(
+      new mongoose.Types.ObjectId(productId)
+    );
     if (!product) {
       return res.status(404).json({
         success: false,
@@ -77,15 +82,17 @@ export const addToWishlist = async (req, res) => {
       });
     }
 
-    let wishlist = await Wishlist.findOne({ user: req.user.id });
+    let wishlist = await Wishlist.findOne({
+      user: new mongoose.Types.ObjectId(req.user.id),
+    });
 
     if (!wishlist) {
       // Create new wishlist if doesn't exist
       wishlist = new Wishlist({
-        user: req.user.id,
+        user: new mongoose.Types.ObjectId(req.user.id),
         items: [
           {
-            product: productId,
+            product: new mongoose.Types.ObjectId(productId),
             addedAt: new Date(),
           },
         ],
@@ -141,7 +148,9 @@ export const removeFromWishlist = async (req, res) => {
   try {
     const { productId } = req.params;
 
-    const wishlist = await Wishlist.findOne({ user: req.user.id });
+    const wishlist = await Wishlist.findOne({
+      user: new mongoose.Types.ObjectId(req.user.id),
+    });
 
     if (!wishlist) {
       return res.status(404).json({
@@ -185,7 +194,9 @@ export const removeFromWishlist = async (req, res) => {
 // Clear entire wishlist
 export const clearWishlist = async (req, res) => {
   try {
-    const wishlist = await Wishlist.findOne({ user: req.user.id });
+    const wishlist = await Wishlist.findOne({
+      user: new mongoose.Types.ObjectId(req.user.id),
+    });
 
     if (!wishlist) {
       return res.status(404).json({
@@ -219,7 +230,9 @@ export const moveToCart = async (req, res) => {
   try {
     const { productId, quantity = 1 } = req.body;
 
-    const wishlist = await Wishlist.findOne({ user: req.user.id });
+    const wishlist = await Wishlist.findOne({
+      user: new mongoose.Types.ObjectId(req.user.id),
+    });
 
     if (!wishlist) {
       return res.status(404).json({
@@ -248,7 +261,9 @@ export const moveToCart = async (req, res) => {
     }
 
     // Check product availability
-    const product = await Product.findById(productId);
+    const product = await Product.findById(
+      new mongoose.Types.ObjectId(productId)
+    );
     if (!product) {
       return res.status(404).json({
         success: false,
@@ -289,10 +304,9 @@ export const moveToCart = async (req, res) => {
 // Get wishlist statistics
 export const getWishlistStats = async (req, res) => {
   try {
-    const wishlist = await Wishlist.findOne({ user: req.user.id }).populate(
-      "items.product",
-      "price category"
-    );
+    const wishlist = await Wishlist.findOne({
+      user: new mongoose.Types.ObjectId(req.user.id),
+    }).populate("items.product", "price category");
 
     if (!wishlist || wishlist.items.length === 0) {
       return res.json({
@@ -353,8 +367,8 @@ export const isInWishlist = async (req, res) => {
     const { productId } = req.params;
 
     const wishlist = await Wishlist.findOne({
-      user: req.user.id,
-      "items.product": productId,
+      user: new mongoose.Types.ObjectId(req.user.id),
+      "items.product": new mongoose.Types.ObjectId(productId),
     });
 
     res.json({
@@ -384,7 +398,9 @@ export const checkMultipleProducts = async (req, res) => {
       });
     }
 
-    const wishlist = await Wishlist.findOne({ user: req.user.id });
+    const wishlist = await Wishlist.findOne({
+      user: new mongoose.Types.ObjectId(req.user.id),
+    });
 
     if (!wishlist) {
       return res.json({
