@@ -138,6 +138,16 @@ jest.mock('../utils/emailService.mjs', () => ({
     }),
     testConnection: jest.fn().mockResolvedValue({ success: true }),
   },
+  // Also export the methods directly for different import styles
+  sendVerificationEmail: jest.fn().mockResolvedValue({ success: true }),
+  sendWelcomeEmail: jest.fn().mockResolvedValue({ success: true }),
+  sendPasswordResetEmail: jest.fn().mockResolvedValue({ success: true }),
+  generateVerificationToken: jest.fn().mockReturnValue('test-token'),
+  generateResetToken: jest.fn().mockReturnValue({
+    token: 'reset-token',
+    hashedToken: 'hashed-reset-token',
+  }),
+  testConnection: jest.fn().mockResolvedValue({ success: true }),
 }));
 
 // Mock error handler

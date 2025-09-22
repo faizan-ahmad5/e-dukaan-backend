@@ -1,6 +1,21 @@
-import jwt from "jsonwebtoken";
-import bcryptjs from "bcryptjs";
-import { User } from "../../models/UserSchema.mjs";
+// Mock emailService before any imports that might use it
+jest.doMock('../../utils/emailService.mjs', () => ({
+  default: {
+    sendVerificationEmail: jest.fn().mockResolvedValue({ success: true }),
+    sendWelcomeEmail: jest.fn().mockResolvedValue({ success: true }),
+    sendPasswordResetEmail: jest.fn().mockResolvedValue({ success: true }),
+    generateVerificationToken: jest.fn().mockReturnValue('test-token'),
+    generateResetToken: jest.fn().mockReturnValue({
+      token: 'reset-token',
+      hashedToken: 'hashed-reset-token',
+    }),
+    testConnection: jest.fn().mockResolvedValue({ success: true }),
+  },
+}));
+
+import jwt from 'jsonwebtoken';
+import bcryptjs from 'bcryptjs';
+import { User } from '../../models/UserSchema.mjs';
 import {
   registerUser,
   loginUser,
@@ -8,8 +23,9 @@ import {
   resendVerificationEmail,
   forgotPassword,
   resetPassword,
-} from "../../controllers/authController.mjs";
-import emailService from "../../utils/emailService.mjs";
+} from '../../controllers/authController.mjs';
+
+import emailService from '../../utils/emailService.mjs';
 
 // Mock response and request objects
 const mockResponse = () => {
@@ -26,7 +42,7 @@ const mockRequest = (body = {}, params = {}, headers = {}) => ({
   user: null,
 });
 
-describe("Auth Controller - Unit Tests", () => {
+describe('Auth Controller - Unit Tests', () => {
   let req, res;
 
   beforeEach(() => {
@@ -35,28 +51,28 @@ describe("Auth Controller - Unit Tests", () => {
     jest.clearAllMocks();
   });
 
-  describe("registerUser", () => {
-    it("should register a new user successfully", async () => {
+  describe('registerUser', () => {
+    it('should register a new user successfully', async () => {
       const userData = {
-        name: "John Doe",
-        email: "john@example.com",
-        password: "password123",
+        name: 'John Doe',
+        email: 'john@example.com',
+        password: 'password123',
       };
 
       req.body = userData;
 
       // Mock User.findOne to return null (user doesn't exist)
-      jest.spyOn(User, "findOne").mockResolvedValue(null);
+      jest.spyOn(User, 'findOne').mockResolvedValue(null);
 
       // Mock User.save
       const mockUser = {
-        _id: "user123",
+        _id: 'user123',
         name: userData.name,
         email: userData.email,
         isVerified: false,
         save: jest.fn().mockResolvedValue(true),
       };
-      jest.spyOn(User.prototype, "save").mockResolvedValue(mockUser);
+      jest.spyOn(User.prototype, 'save').mockResolvedValue(mockUser);
 
       await registerUser(req, res);
 
@@ -64,7 +80,7 @@ describe("Auth Controller - Unit Tests", () => {
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: true,
-          message: expect.stringContaining("Registration successful"),
+          message: expect.stringContaining('Registration successful'),
           data: expect.objectContaining({
             _id: expect.any(String),
             name: userData.name,
@@ -76,17 +92,17 @@ describe("Auth Controller - Unit Tests", () => {
       expect(emailService.default.sendVerificationEmail).toHaveBeenCalled();
     });
 
-    it("should return error if user already exists", async () => {
+    it('should return error if user already exists', async () => {
       const userData = {
-        name: "John Doe",
-        email: "john@example.com",
-        password: "password123",
+        name: 'John Doe',
+        email: 'john@example.com',
+        password: 'password123',
       };
 
       req.body = userData;
 
       // Mock User.findOne to return existing user
-      jest.spyOn(User, "findOne").mockResolvedValue({ email: userData.email });
+      jest.spyOn(User, 'findOne').mockResolvedValue({ email: userData.email });
 
       await registerUser(req, res);
 
@@ -94,15 +110,15 @@ describe("Auth Controller - Unit Tests", () => {
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: false,
-          message: "User with this email already exists",
+          message: 'User with this email already exists',
         })
       );
     });
 
-    it("should handle missing email", async () => {
+    it('should handle missing email', async () => {
       req.body = {
-        name: "John Doe",
-        password: "password123",
+        name: 'John Doe',
+        password: 'password123',
         // email is missing
       };
 
@@ -112,24 +128,24 @@ describe("Auth Controller - Unit Tests", () => {
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: false,
-          message: "Valid email is required",
+          message: 'Valid email is required',
         })
       );
     });
   });
 
-  describe("loginUser", () => {
-    it("should login user with valid credentials", async () => {
+  describe('loginUser', () => {
+    it('should login user with valid credentials', async () => {
       const loginData = {
-        email: "john@example.com",
-        password: "password123",
+        email: 'john@example.com',
+        password: 'password123',
       };
 
       req.body = loginData;
 
       const mockUser = {
-        _id: "user123",
-        name: "John Doe",
+        _id: 'user123',
+        name: 'John Doe',
         email: loginData.email,
         isAdmin: false,
         isVerified: true,
@@ -138,14 +154,14 @@ describe("Auth Controller - Unit Tests", () => {
         save: jest.fn().mockResolvedValue(true),
       };
 
-      jest.spyOn(User, "findOne").mockResolvedValue(mockUser);
+      jest.spyOn(User, 'findOne').mockResolvedValue(mockUser);
 
       await loginUser(req, res);
 
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: true,
-          message: "Login successful",
+          message: 'Login successful',
           data: expect.objectContaining({
             _id: mockUser._id,
             name: mockUser.name,
@@ -157,10 +173,10 @@ describe("Auth Controller - Unit Tests", () => {
       expect(mockUser.save).toHaveBeenCalled();
     });
 
-    it("should return error for invalid credentials", async () => {
+    it('should return error for invalid credentials', async () => {
       const loginData = {
-        email: "john@example.com",
-        password: "wrongpassword",
+        email: 'john@example.com',
+        password: 'wrongpassword',
       };
 
       req.body = loginData;
@@ -169,7 +185,7 @@ describe("Auth Controller - Unit Tests", () => {
         matchPassword: jest.fn().mockResolvedValue(false),
       };
 
-      jest.spyOn(User, "findOne").mockResolvedValue(mockUser);
+      jest.spyOn(User, 'findOne').mockResolvedValue(mockUser);
 
       await loginUser(req, res);
 
@@ -177,18 +193,18 @@ describe("Auth Controller - Unit Tests", () => {
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: false,
-          message: "Invalid credentials",
+          message: 'Invalid credentials',
         })
       );
     });
 
-    it("should return error if user not found", async () => {
+    it('should return error if user not found', async () => {
       req.body = {
-        email: "nonexistent@example.com",
-        password: "password123",
+        email: 'nonexistent@example.com',
+        password: 'password123',
       };
 
-      jest.spyOn(User, "findOne").mockResolvedValue(null);
+      jest.spyOn(User, 'findOne').mockResolvedValue(null);
 
       await loginUser(req, res);
 
@@ -196,26 +212,26 @@ describe("Auth Controller - Unit Tests", () => {
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: false,
-          message: "Invalid credentials",
+          message: 'Invalid credentials',
         })
       );
     });
 
-    it("should return error if user not verified", async () => {
+    it('should return error if user not verified', async () => {
       const loginData = {
-        email: "john@example.com",
-        password: "password123",
+        email: 'john@example.com',
+        password: 'password123',
       };
 
       req.body = loginData;
 
       const mockUser = {
-        _id: "user123",
+        _id: 'user123',
         isVerified: false,
         matchPassword: jest.fn().mockResolvedValue(true),
       };
 
-      jest.spyOn(User, "findOne").mockResolvedValue(mockUser);
+      jest.spyOn(User, 'findOne').mockResolvedValue(mockUser);
 
       await loginUser(req, res);
 
@@ -223,7 +239,7 @@ describe("Auth Controller - Unit Tests", () => {
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: false,
-          message: "Please verify your email address before logging in",
+          message: 'Please verify your email address before logging in',
           needsVerification: true,
           userId: mockUser._id,
         })
@@ -231,21 +247,21 @@ describe("Auth Controller - Unit Tests", () => {
     });
   });
 
-  describe("verifyEmail", () => {
-    it("should verify email with valid token", async () => {
-      req.params = { token: "valid-token" };
+  describe('verifyEmail', () => {
+    it('should verify email with valid token', async () => {
+      req.params = { token: 'valid-token' };
 
       const mockUser = {
-        _id: "user123",
-        name: "John Doe",
-        email: "john@example.com",
+        _id: 'user123',
+        name: 'John Doe',
+        email: 'john@example.com',
         isVerified: false,
-        verificationToken: "hashed-token",
+        verificationToken: 'hashed-token',
         verificationTokenExpire: Date.now() + 86400000, // 24 hours
         save: jest.fn().mockResolvedValue(true),
       };
 
-      jest.spyOn(User, "findOne").mockResolvedValue(mockUser);
+      jest.spyOn(User, 'findOne').mockResolvedValue(mockUser);
 
       await verifyEmail(req, res);
 
@@ -253,22 +269,20 @@ describe("Auth Controller - Unit Tests", () => {
       expect(mockUser.verificationToken).toBeUndefined();
       expect(mockUser.verificationTokenExpire).toBeUndefined();
       expect(mockUser.save).toHaveBeenCalled();
-      expect(emailService.default.sendWelcomeEmail).toHaveBeenCalledWith(
-        mockUser
-      );
+      expect(emailService.sendWelcomeEmail).toHaveBeenCalledWith(mockUser);
 
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: true,
-          message: "Email verified successfully! You can now log in.",
+          message: 'Email verified successfully! You can now log in.',
         })
       );
     });
 
-    it("should return error for invalid token", async () => {
-      req.params = { token: "invalid-token" };
+    it('should return error for invalid token', async () => {
+      req.params = { token: 'invalid-token' };
 
-      jest.spyOn(User, "findOne").mockResolvedValue(null);
+      jest.spyOn(User, 'findOne').mockResolvedValue(null);
 
       await verifyEmail(req, res);
 
@@ -276,12 +290,12 @@ describe("Auth Controller - Unit Tests", () => {
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: false,
-          message: "Invalid or expired verification token",
+          message: 'Invalid or expired verification token',
         })
       );
     });
 
-    it("should return error for missing token", async () => {
+    it('should return error for missing token', async () => {
       req.params = {}; // No token
 
       await verifyEmail(req, res);
@@ -290,44 +304,44 @@ describe("Auth Controller - Unit Tests", () => {
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: false,
-          message: "Verification token is required",
+          message: 'Verification token is required',
         })
       );
     });
   });
 
-  describe("forgotPassword", () => {
-    it("should send password reset email for valid user", async () => {
-      req.body = { email: "john@example.com" };
+  describe('forgotPassword', () => {
+    it('should send password reset email for valid user', async () => {
+      req.body = { email: 'john@example.com' };
 
       const mockUser = {
-        _id: "user123",
-        email: "john@example.com",
+        _id: 'user123',
+        email: 'john@example.com',
         isVerified: true,
         resetPasswordToken: null,
         resetPasswordExpire: null,
         save: jest.fn().mockResolvedValue(true),
       };
 
-      jest.spyOn(User, "findOne").mockResolvedValue(mockUser);
+      jest.spyOn(User, 'findOne').mockResolvedValue(mockUser);
 
       await forgotPassword(req, res);
 
       expect(mockUser.save).toHaveBeenCalled();
-      expect(emailService.default.sendPasswordResetEmail).toHaveBeenCalled();
+      expect(emailService.sendPasswordResetEmail).toHaveBeenCalled();
 
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: true,
-          message: "Password reset email sent successfully",
+          message: 'Password reset email sent successfully',
         })
       );
     });
 
-    it("should return error for non-existent user", async () => {
-      req.body = { email: "nonexistent@example.com" };
+    it('should return error for non-existent user', async () => {
+      req.body = { email: 'nonexistent@example.com' };
 
-      jest.spyOn(User, "findOne").mockResolvedValue(null);
+      jest.spyOn(User, 'findOne').mockResolvedValue(null);
 
       await forgotPassword(req, res);
 
@@ -335,20 +349,20 @@ describe("Auth Controller - Unit Tests", () => {
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: false,
-          message: "User not found with that email",
+          message: 'User not found with that email',
         })
       );
     });
 
-    it("should return error for unverified user", async () => {
-      req.body = { email: "john@example.com" };
+    it('should return error for unverified user', async () => {
+      req.body = { email: 'john@example.com' };
 
       const mockUser = {
-        email: "john@example.com",
+        email: 'john@example.com',
         isVerified: false,
       };
 
-      jest.spyOn(User, "findOne").mockResolvedValue(mockUser);
+      jest.spyOn(User, 'findOne').mockResolvedValue(mockUser);
 
       await forgotPassword(req, res);
 
@@ -356,30 +370,30 @@ describe("Auth Controller - Unit Tests", () => {
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: false,
-          message: "Please verify your email address first",
+          message: 'Please verify your email address first',
         })
       );
     });
   });
 
-  describe("resetPassword", () => {
-    it("should reset password with valid token", async () => {
-      req.params = { token: "valid-reset-token" };
-      req.body = { password: "newpassword123" };
+  describe('resetPassword', () => {
+    it('should reset password with valid token', async () => {
+      req.params = { token: 'valid-reset-token' };
+      req.body = { password: 'newpassword123' };
 
       const mockUser = {
-        _id: "user123",
-        resetPasswordToken: "hashed-token",
+        _id: 'user123',
+        resetPasswordToken: 'hashed-token',
         resetPasswordExpire: Date.now() + 600000, // 10 minutes
         password: null,
         save: jest.fn().mockResolvedValue(true),
       };
 
-      jest.spyOn(User, "findOne").mockResolvedValue(mockUser);
+      jest.spyOn(User, 'findOne').mockResolvedValue(mockUser);
 
       await resetPassword(req, res);
 
-      expect(mockUser.password).toBe("newpassword123");
+      expect(mockUser.password).toBe('newpassword123');
       expect(mockUser.resetPasswordToken).toBeUndefined();
       expect(mockUser.resetPasswordExpire).toBeUndefined();
       expect(mockUser.save).toHaveBeenCalled();
@@ -387,16 +401,16 @@ describe("Auth Controller - Unit Tests", () => {
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: true,
-          message: expect.stringContaining("Password reset successfully"),
+          message: expect.stringContaining('Password reset successfully'),
         })
       );
     });
 
-    it("should return error for invalid token", async () => {
-      req.params = { token: "invalid-token" };
-      req.body = { password: "newpassword123" };
+    it('should return error for invalid token', async () => {
+      req.params = { token: 'invalid-token' };
+      req.body = { password: 'newpassword123' };
 
-      jest.spyOn(User, "findOne").mockResolvedValue(null);
+      jest.spyOn(User, 'findOne').mockResolvedValue(null);
 
       await resetPassword(req, res);
 
@@ -404,14 +418,14 @@ describe("Auth Controller - Unit Tests", () => {
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: false,
-          message: "Invalid or expired reset token",
+          message: 'Invalid or expired reset token',
         })
       );
     });
 
-    it("should return error for password too short", async () => {
-      req.params = { token: "valid-reset-token" };
-      req.body = { password: "123" }; // Too short
+    it('should return error for password too short', async () => {
+      req.params = { token: 'valid-reset-token' };
+      req.body = { password: '123' }; // Too short
 
       await resetPassword(req, res);
 
@@ -419,7 +433,7 @@ describe("Auth Controller - Unit Tests", () => {
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: false,
-          message: "Password must be at least 6 characters long",
+          message: 'Password must be at least 6 characters long',
         })
       );
     });

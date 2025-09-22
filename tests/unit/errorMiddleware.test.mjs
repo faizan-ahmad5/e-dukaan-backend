@@ -1,38 +1,24 @@
-import { jest } from "@jest/globals";
 import {
   notFound,
   errorHandler,
   handleValidationErrors,
-} from "../../middleware/errorMiddleware.mjs";
+} from '../../middleware/errorMiddleware.mjs';
 
-// Mock dependencies
-const mockGlobalErrorHandler = jest.fn();
-const mockAppError = jest.fn();
-const mockLogger = {
-  error: jest.fn(),
-  info: jest.fn(),
-};
+// Mocks are handled globally in jest.setup.mjs - no local mocking needed
 
-jest.unstable_mockModule("../../utils/errorHandler.mjs", () => ({
-  globalErrorHandler: mockGlobalErrorHandler,
-  AppError: mockAppError,
+// Mock express-validator for this test
+const mockValidationResult = jest.fn();
+jest.doMock('express-validator', () => ({
+  validationResult: mockValidationResult,
 }));
 
-jest.unstable_mockModule("../../utils/logger.mjs", () => ({
-  default: mockLogger,
-}));
-
-jest.unstable_mockModule("express-validator", () => ({
-  validationResult: jest.fn(),
-}));
-
-describe("Error Middleware", () => {
+describe('Error Middleware - Unit Tests', () => {
   let req, res, next;
 
   beforeEach(() => {
     req = {
-      method: "GET",
-      originalUrl: "/api/test",
+      method: 'GET',
+      originalUrl: '/api/test',
     };
 
     res = {
@@ -51,23 +37,23 @@ describe("Error Middleware", () => {
     next.mockClear();
   });
 
-  describe("notFound middleware", () => {
-    it("should create 404 error for undefined routes", () => {
+  describe('notFound middleware', () => {
+    it('should create 404 error for undefined routes', () => {
       notFound(req, res, next);
 
       expect(mockAppError).toHaveBeenCalledWith(
-        "Route not found: GET /api/test",
+        'Route not found: GET /api/test',
         404,
         true,
-        "ROUTE_NOT_FOUND"
+        'ROUTE_NOT_FOUND'
       );
       expect(next).toHaveBeenCalled();
     });
   });
 
-  describe("errorHandler middleware", () => {
-    it("should delegate to global error handler", () => {
-      const error = new Error("Test error");
+  describe('errorHandler middleware', () => {
+    it('should delegate to global error handler', () => {
+      const error = new Error('Test error');
 
       errorHandler(error, req, res, next);
 
@@ -80,15 +66,15 @@ describe("Error Middleware", () => {
     });
   });
 
-  describe("handleValidationErrors middleware", () => {
+  describe('handleValidationErrors middleware', () => {
     let mockValidationResult;
 
     beforeEach(async () => {
-      const { validationResult } = await import("express-validator");
+      const { validationResult } = await import('express-validator');
       mockValidationResult = validationResult;
     });
 
-    it("should pass through when no validation errors", () => {
+    it('should pass through when no validation errors', () => {
       mockValidationResult.mockReturnValue({
         isEmpty: () => true,
         array: () => [],
@@ -100,10 +86,10 @@ describe("Error Middleware", () => {
       expect(mockAppError).not.toHaveBeenCalled();
     });
 
-    it("should create AppError when validation fails", () => {
+    it('should create AppError when validation fails', () => {
       const mockErrors = [
-        { path: "email", msg: "Invalid email", value: "invalid-email" },
-        { path: "password", msg: "Password too short", value: "123" },
+        { path: 'email', msg: 'Invalid email', value: 'invalid-email' },
+        { path: 'password', msg: 'Password too short', value: '123' },
       ];
 
       mockValidationResult.mockReturnValue({
@@ -114,19 +100,19 @@ describe("Error Middleware", () => {
       handleValidationErrors(req, res, next);
 
       expect(mockAppError).toHaveBeenCalledWith(
-        "Input validation failed",
+        'Input validation failed',
         400,
         true,
-        "VALIDATION_FAILED"
+        'VALIDATION_FAILED'
       );
       expect(next).toHaveBeenCalled();
     });
 
-    it("should format validation errors properly in development", () => {
-      process.env.NODE_ENV = "development";
+    it('should format validation errors properly in development', () => {
+      process.env.NODE_ENV = 'development';
 
       const mockErrors = [
-        { path: "email", msg: "Invalid email", value: "test@invalid" },
+        { path: 'email', msg: 'Invalid email', value: 'test@invalid' },
       ];
 
       mockValidationResult.mockReturnValue({
@@ -143,20 +129,20 @@ describe("Error Middleware", () => {
 
       expect(mockErrorInstance.errors).toEqual([
         {
-          field: "email",
-          message: "Invalid email",
-          value: "test@invalid",
+          field: 'email',
+          message: 'Invalid email',
+          value: 'test@invalid',
         },
       ]);
 
       delete process.env.NODE_ENV;
     });
 
-    it("should hide validation values in production", () => {
-      process.env.NODE_ENV = "production";
+    it('should hide validation values in production', () => {
+      process.env.NODE_ENV = 'production';
 
       const mockErrors = [
-        { path: "password", msg: "Password required", value: "secret123" },
+        { path: 'password', msg: 'Password required', value: 'secret123' },
       ];
 
       mockValidationResult.mockReturnValue({
@@ -173,16 +159,16 @@ describe("Error Middleware", () => {
 
       expect(mockErrorInstance.errors).toEqual([
         {
-          field: "password",
-          message: "Password required",
+          field: 'password',
+          message: 'Password required',
         },
       ]);
 
       delete process.env.NODE_ENV;
     });
 
-    it("should handle errors with param field", () => {
-      const mockErrors = [{ param: "id", msg: "Invalid ID", value: "abc123" }];
+    it('should handle errors with param field', () => {
+      const mockErrors = [{ param: 'id', msg: 'Invalid ID', value: 'abc123' }];
 
       mockValidationResult.mockReturnValue({
         isEmpty: () => false,
@@ -198,8 +184,8 @@ describe("Error Middleware", () => {
 
       expect(mockErrorInstance.errors).toEqual([
         {
-          field: "id",
-          message: "Invalid ID",
+          field: 'id',
+          message: 'Invalid ID',
         },
       ]);
     });
