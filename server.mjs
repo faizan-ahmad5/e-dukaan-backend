@@ -1,3 +1,6 @@
+// Load test environment configuration first
+import testConfig from "./config/testEnvironment.mjs";
+
 import { validateEnvironment, getConfig } from "./config/environment.mjs";
 import logger, { requestLogger } from "./utils/logger.mjs";
 

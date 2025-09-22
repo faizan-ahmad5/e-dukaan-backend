@@ -19,7 +19,8 @@ router.use(protect);
 // Get user's wishlist
 router.get("/", getWishlist);
 
-// Add item to wishlist
+// Add item to wishlist (both routes for compatibility)
+router.post("/", addToWishlist);
 router.post("/add", addToWishlist);
 
 // Remove item from wishlist

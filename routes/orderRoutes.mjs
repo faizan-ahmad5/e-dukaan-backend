@@ -15,11 +15,19 @@ const router = express.Router();
 // Create new order (Protected)
 router.post("/", protect, createOrder);
 
-// Get user's orders (Protected)
-router.get("/my-orders", protect, getUserOrders);
+// Get user's orders (Protected) or all orders (Admin only)
+router.get("/", protect, (req, res, next) => {
+  if (req.user.isAdmin) {
+    // Admin can see all orders
+    getAllOrders(req, res);
+  } else {
+    // Regular users see only their orders
+    getUserOrders(req, res);
+  }
+});
 
-// Get all orders (Admin only)
-router.get("/", protect, isAdmin, getAllOrders);
+// Get user's orders (Protected) - alternative endpoint
+router.get("/my-orders", protect, getUserOrders);
 
 // Get order statistics (Admin only)
 router.get("/stats", protect, isAdmin, getOrderStats);

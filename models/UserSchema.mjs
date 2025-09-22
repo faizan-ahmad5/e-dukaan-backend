@@ -48,6 +48,11 @@ const userSchema = mongoose.Schema(
         message: "Please provide a valid avatar image URL",
       },
     },
+    bio: {
+      type: String,
+      trim: true,
+      maxlength: [500, "Bio cannot exceed 500 characters"],
+    },
     dateOfBirth: {
       type: Date,
       validate: {

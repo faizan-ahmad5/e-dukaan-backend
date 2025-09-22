@@ -215,4 +215,9 @@ orderSchema.virtual("isDelivered").get(function () {
   return this.orderStatus === "delivered";
 });
 
+// Virtual for totalAmount to maintain backwards compatibility
+orderSchema.virtual("totalAmount").get(function () {
+  return this.pricing ? this.pricing.totalPrice : 0;
+});
+
 export const Order = mongoose.model("Order", orderSchema);

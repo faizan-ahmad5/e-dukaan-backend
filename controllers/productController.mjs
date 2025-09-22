@@ -100,8 +100,7 @@ export const getProducts = async (req, res) => {
     const products = await Product.find(filter)
       .sort(sortObj)
       .skip(skip)
-      .limit(Number(limit))
-      .populate("reviews", "rating");
+      .limit(Number(limit));
 
     const total = await Product.countDocuments(filter);
 
@@ -130,12 +129,25 @@ export const getProductById = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (product) {
-      res.json(product);
+      res.json({
+        success: true,
+        data: product,
+        timestamp: new Date().toISOString(),
+      });
     } else {
-      res.status(404).json({ message: "Product not found" });
+      res.status(404).json({
+        success: false,
+        message: "Product not found",
+        timestamp: new Date().toISOString(),
+      });
     }
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch product" });
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch product",
+      error: error.message,
+      timestamp: new Date().toISOString(),
+    });
   }
 };
 

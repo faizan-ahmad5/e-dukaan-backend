@@ -9,28 +9,28 @@ export const getWishlist = async (req, res) => {
       user: new mongoose.Types.ObjectId(req.user.id),
     })
       .populate({
-        path: "items.product",
+        path: "products.product",
         select: "title image price brand category inventory rating",
       })
-      .sort({ "items.addedAt": -1 });
+      .sort({ "products.addedAt": -1 });
 
     if (!wishlist) {
       return res.json({
         success: true,
         data: {
-          items: [],
+          products: [],
           totalItems: 0,
         },
       });
     }
 
     // Filter out products that no longer exist
-    const validItems = wishlist.items.filter((item) => item.product);
+    const validItems = wishlist.products.filter((item) => item.product);
 
     res.json({
       success: true,
       data: {
-        items: validItems,
+        products: validItems,
         totalItems: validItems.length,
       },
     });
@@ -90,7 +90,7 @@ export const addToWishlist = async (req, res) => {
       // Create new wishlist if doesn't exist
       wishlist = new Wishlist({
         user: new mongoose.Types.ObjectId(req.user.id),
-        items: [
+        products: [
           {
             product: new mongoose.Types.ObjectId(productId),
             addedAt: new Date(),
@@ -99,7 +99,7 @@ export const addToWishlist = async (req, res) => {
       });
     } else {
       // Check if item already exists in wishlist
-      const existingItem = wishlist.items.find(
+      const existingItem = wishlist.products.find(
         (item) => item.product.toString() === productId
       );
 
@@ -111,7 +111,7 @@ export const addToWishlist = async (req, res) => {
       }
 
       // Add new item to wishlist
-      wishlist.items.push({
+      wishlist.products.push({
         product: productId,
         addedAt: new Date(),
       });
@@ -122,7 +122,7 @@ export const addToWishlist = async (req, res) => {
 
     // Populate the newly added item
     await wishlist.populate({
-      path: "items.product",
+      path: "products.product",
       select: "title image price brand category inventory rating",
     });
 
@@ -130,8 +130,10 @@ export const addToWishlist = async (req, res) => {
       success: true,
       message: "Product added to wishlist successfully",
       data: {
-        totalItems: wishlist.items.length,
-        addedItem: wishlist.items[wishlist.items.length - 1],
+        user: req.user.id,
+        products: wishlist.products,
+        totalItems: wishlist.products.length,
+        addedItem: wishlist.products[wishlist.products.length - 1],
       },
     });
   } catch (error) {
