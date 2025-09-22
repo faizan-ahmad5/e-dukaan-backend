@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { User } from '../models/UserSchema.mjs';
 import emailService from '../utils/emailService.mjs';
+import logger from '../utils/logger.mjs';
 
 // Generate JWT token
 const generateToken = id => {

@@ -2,6 +2,7 @@ import { Review } from '../models/ReviewSchema.mjs';
 import { Product } from '../models/ProductSchema.mjs';
 import { Order } from '../models/OrderSchema.mjs';
 import mongoose from 'mongoose';
+import logger from '../utils/logger.mjs';
 
 // Create a new review
 export const createReview = async (req, res) => {

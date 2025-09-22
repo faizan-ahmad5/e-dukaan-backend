@@ -1,6 +1,7 @@
 import { Cart } from '../models/CartSchema.mjs';
 import { Product } from '../models/ProductSchema.mjs';
 import mongoose from 'mongoose';
+import logger from '../utils/logger.mjs';
 
 // Add product to cart
 export const addToCart = async (req, res) => {
