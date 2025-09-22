@@ -20,7 +20,7 @@ export default [
         exports: 'readonly',
         URL: 'readonly',
         URLSearchParams: 'readonly',
-        
+
         // Testing globals
         jest: 'readonly',
         describe: 'readonly',
@@ -31,22 +31,27 @@ export default [
         afterEach: 'readonly',
         beforeAll: 'readonly',
         afterAll: 'readonly',
-        
+
         // MongoDB globals (for scripts)
         db: 'readonly',
-        print: 'readonly'
-      }
+        print: 'readonly',
+      },
     },
     plugins: {
-      security
+      security,
     },
     rules: {
       // Relaxed rules for existing codebase
       'no-console': 'off', // Allow console statements
-      'no-unused-vars': ['warn', { 
-        'argsIgnorePattern': '^_|^req|^res|^next|^error|^err|^header|^page|^promise|^expectedStatus',
-        'varsIgnorePattern': '^_|^testConfig|^userToken|^rateLimitedResponses|^paymentResult|^protect|^isAdmin|^resendVerificationEmail|^mockNext|^jwt|^bcryptjs'
-      }],
+      'no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern:
+            '^_|^req|^res|^next|^error|^err|^header|^page|^promise|^expectedStatus',
+          varsIgnorePattern:
+            '^_|^testConfig|^userToken|^rateLimitedResponses|^paymentResult|^protect|^isAdmin|^resendVerificationEmail|^mockNext|^jwt|^bcryptjs',
+        },
+      ],
       'no-undef': 'error',
       'no-underscore-dangle': 'off',
       'consistent-return': 'off',
@@ -56,7 +61,7 @@ export default [
       'no-await-in-loop': 'off',
       'no-useless-escape': 'warn',
       'no-dupe-keys': 'warn', // Warning instead of error
-      
+
       // Security rules (mostly warnings to avoid breaking existing code)
       'security/detect-object-injection': 'off',
       'security/detect-non-literal-fs-filename': 'off',
@@ -68,8 +73,8 @@ export default [
       'security/detect-disable-mustache-escape': 'warn',
       'security/detect-no-csrf-before-method-override': 'off',
       'security/detect-possible-timing-attacks': 'off',
-      'security/detect-pseudoRandomBytes': 'warn'
-    }
+      'security/detect-pseudoRandomBytes': 'warn',
+    },
   },
   {
     files: ['scripts/mongo-init.js'],
@@ -77,13 +82,13 @@ export default [
       globals: {
         // MongoDB shell globals
         db: 'writable',
-        print: 'readonly'
-      }
+        print: 'readonly',
+      },
     },
     rules: {
       'no-global-assign': 'off',
-      'no-implicit-globals': 'off'
-    }
+      'no-implicit-globals': 'off',
+    },
   },
   {
     files: ['tests/**/*.mjs', 'tests/**/*.js'],
@@ -91,20 +96,20 @@ export default [
       'no-console': 'off',
       'prefer-arrow-callback': 'off',
       'func-names': 'off',
-      'no-unused-vars': 'off' // Very lenient for test files
-    }
+      'no-unused-vars': 'off', // Very lenient for test files
+    },
   },
   {
     files: ['server.mjs', 'scripts/**/*.mjs', 'config/**/*.mjs'],
     rules: {
-      'no-console': 'off'
-    }
+      'no-console': 'off',
+    },
   },
   {
     files: ['playwright.config.mjs'],
     rules: {
-      'no-dupe-keys': 'off' // Allow duplicate keys in Playwright config
-    }
+      'no-dupe-keys': 'off', // Allow duplicate keys in Playwright config
+    },
   },
   {
     ignores: [
@@ -117,7 +122,7 @@ export default [
       'logs/',
       'uploads/',
       '.env*',
-      '*.log'
-    ]
-  }
+      '*.log',
+    ],
+  },
 ];

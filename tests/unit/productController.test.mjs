@@ -2,7 +2,7 @@ import { Product } from "../../models/ProductSchema.mjs";
 import {
   createProduct,
   getProducts,
-  getProduct,
+  getProductById, // Fixed import name
   updateProduct,
   deleteProduct,
 } from "../../controllers/productController.mjs";
@@ -231,7 +231,7 @@ describe("Product Controller - Unit Tests", () => {
     });
   });
 
-  describe("getProduct", () => {
+  describe("getProductById", () => {
     it("should return single product by id", async () => {
       const productId = "507f1f77bcf86cd799439011";
       req.params = { id: productId };
@@ -248,7 +248,7 @@ describe("Product Controller - Unit Tests", () => {
       };
       jest.spyOn(Product, "findById").mockReturnValue(mockQuery);
 
-      await getProduct(req, res);
+      await getProductById(req, res);
 
       expect(Product.findById).toHaveBeenCalledWith(productId);
       expect(res.json).toHaveBeenCalledWith(
@@ -262,7 +262,7 @@ describe("Product Controller - Unit Tests", () => {
     it("should return 404 for invalid ObjectId", async () => {
       req.params = { id: "invalid-id" };
 
-      await getProduct(req, res);
+      await getProductById(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith(
@@ -282,7 +282,7 @@ describe("Product Controller - Unit Tests", () => {
       };
       jest.spyOn(Product, "findById").mockReturnValue(mockQuery);
 
-      await getProduct(req, res);
+      await getProductById(req, res);
 
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.json).toHaveBeenCalledWith(
