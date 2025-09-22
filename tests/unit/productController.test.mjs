@@ -1,11 +1,11 @@
-import { Product } from "../../models/ProductSchema.mjs";
+import { Product } from '../../models/ProductSchema.mjs';
 import {
   createProduct,
   getProducts,
   getProductById, // Fixed import name
   updateProduct,
   deleteProduct,
-} from "../../controllers/productController.mjs";
+} from '../../controllers/productController.mjs';
 
 // Mock response and request objects
 const mockResponse = () => {
@@ -21,7 +21,7 @@ const mockRequest = (body = {}, params = {}, query = {}) => ({
   query,
 });
 
-describe("Product Controller - Unit Tests", () => {
+describe('Product Controller - Unit Tests', () => {
   let req, res;
 
   beforeEach(() => {
@@ -30,30 +30,30 @@ describe("Product Controller - Unit Tests", () => {
     jest.clearAllMocks();
   });
 
-  describe("createProduct", () => {
-    it("should create a new product successfully", async () => {
+  describe('createProduct', () => {
+    it('should create a new product successfully', async () => {
       const productData = {
-        title: "Test Product",
-        description: "Test Description",
+        title: 'Test Product',
+        description: 'Test Description',
         price: 99.99,
-        category: "Electronics",
-        brand: "Test Brand",
-        image: "test-image.jpg",
+        category: 'Electronics',
+        brand: 'Test Brand',
+        image: 'test-image.jpg',
         inventory: { inStock: true, quantity: 10 },
       };
 
       req.body = productData;
 
       const mockProduct = {
-        _id: "product123",
+        _id: 'product123',
         ...productData,
         save: jest.fn().mockResolvedValue({
-          _id: "product123",
+          _id: 'product123',
           ...productData,
         }),
       };
 
-      jest.spyOn(Product.prototype, "save").mockResolvedValue(mockProduct);
+      jest.spyOn(Product.prototype, 'save').mockResolvedValue(mockProduct);
 
       await createProduct(req, res);
 
@@ -61,7 +61,7 @@ describe("Product Controller - Unit Tests", () => {
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: true,
-          message: "Product created successfully",
+          message: 'Product created successfully',
           data: expect.objectContaining({
             title: productData.title,
             price: productData.price,
@@ -70,14 +70,14 @@ describe("Product Controller - Unit Tests", () => {
       );
     });
 
-    it("should handle missing required fields", async () => {
+    it('should handle missing required fields', async () => {
       req.body = {
         // Missing required fields like title, price, etc.
-        description: "Test Description",
+        description: 'Test Description',
       };
 
-      const error = new Error("Validation error");
-      jest.spyOn(Product.prototype, "save").mockRejectedValue(error);
+      const error = new Error('Validation error');
+      jest.spyOn(Product.prototype, 'save').mockRejectedValue(error);
 
       await createProduct(req, res);
 
@@ -85,29 +85,29 @@ describe("Product Controller - Unit Tests", () => {
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: false,
-          message: "Failed to create product",
+          message: 'Failed to create product',
         })
       );
     });
 
-    it("should handle image array and single image", async () => {
+    it('should handle image array and single image', async () => {
       const productData = {
-        title: "Test Product",
+        title: 'Test Product',
         price: 99.99,
-        image: "main-image.jpg",
-        images: ["image1.jpg", "image2.jpg"],
-        category: "Electronics",
-        brand: "Test Brand",
+        image: 'main-image.jpg',
+        images: ['image1.jpg', 'image2.jpg'],
+        category: 'Electronics',
+        brand: 'Test Brand',
       };
 
       req.body = productData;
 
       const mockProduct = {
-        _id: "product123",
+        _id: 'product123',
         save: jest.fn().mockResolvedValue(true),
       };
 
-      jest.spyOn(Product.prototype, "save").mockResolvedValue(mockProduct);
+      jest.spyOn(Product.prototype, 'save').mockResolvedValue(mockProduct);
 
       await createProduct(req, res);
 
@@ -115,13 +115,13 @@ describe("Product Controller - Unit Tests", () => {
     });
   });
 
-  describe("getProducts", () => {
-    it("should return paginated products", async () => {
-      req.query = { page: "1", limit: "10" };
+  describe('getProducts', () => {
+    it('should return paginated products', async () => {
+      req.query = { page: '1', limit: '10' };
 
       const mockProducts = [
-        { _id: "product1", title: "Product 1", price: 10.99 },
-        { _id: "product2", title: "Product 2", price: 20.99 },
+        { _id: 'product1', title: 'Product 1', price: 10.99 },
+        { _id: 'product2', title: 'Product 2', price: 20.99 },
       ];
 
       const mockQuery = {
@@ -131,8 +131,8 @@ describe("Product Controller - Unit Tests", () => {
         skip: jest.fn().mockResolvedValue(mockProducts),
       };
 
-      jest.spyOn(Product, "find").mockReturnValue(mockQuery);
-      jest.spyOn(Product, "countDocuments").mockResolvedValue(20);
+      jest.spyOn(Product, 'find').mockReturnValue(mockQuery);
+      jest.spyOn(Product, 'countDocuments').mockResolvedValue(20);
 
       await getProducts(req, res);
 
@@ -151,11 +151,11 @@ describe("Product Controller - Unit Tests", () => {
       );
     });
 
-    it("should handle search queries", async () => {
-      req.query = { search: "laptop", category: "Electronics" };
+    it('should handle search queries', async () => {
+      req.query = { search: 'laptop', category: 'Electronics' };
 
       const mockProducts = [
-        { _id: "product1", title: "Gaming Laptop", category: "Electronics" },
+        { _id: 'product1', title: 'Gaming Laptop', category: 'Electronics' },
       ];
 
       const mockQuery = {
@@ -165,15 +165,15 @@ describe("Product Controller - Unit Tests", () => {
         skip: jest.fn().mockResolvedValue(mockProducts),
       };
 
-      jest.spyOn(Product, "find").mockReturnValue(mockQuery);
-      jest.spyOn(Product, "countDocuments").mockResolvedValue(1);
+      jest.spyOn(Product, 'find').mockReturnValue(mockQuery);
+      jest.spyOn(Product, 'countDocuments').mockResolvedValue(1);
 
       await getProducts(req, res);
 
       expect(Product.find).toHaveBeenCalledWith(
         expect.objectContaining({
           $or: expect.any(Array),
-          category: "Electronics",
+          category: 'Electronics',
         })
       );
       expect(res.json).toHaveBeenCalledWith(
@@ -184,8 +184,8 @@ describe("Product Controller - Unit Tests", () => {
       );
     });
 
-    it("should handle price range filters", async () => {
-      req.query = { minPrice: "10", maxPrice: "50" };
+    it('should handle price range filters', async () => {
+      req.query = { minPrice: '10', maxPrice: '50' };
 
       const mockQuery = {
         populate: jest.fn().mockReturnThis(),
@@ -194,8 +194,8 @@ describe("Product Controller - Unit Tests", () => {
         skip: jest.fn().mockResolvedValue([]),
       };
 
-      jest.spyOn(Product, "find").mockReturnValue(mockQuery);
-      jest.spyOn(Product, "countDocuments").mockResolvedValue(0);
+      jest.spyOn(Product, 'find').mockReturnValue(mockQuery);
+      jest.spyOn(Product, 'countDocuments').mockResolvedValue(0);
 
       await getProducts(req, res);
 
@@ -206,10 +206,10 @@ describe("Product Controller - Unit Tests", () => {
       );
     });
 
-    it("should handle database errors", async () => {
+    it('should handle database errors', async () => {
       req.query = {};
 
-      const error = new Error("Database error");
+      const error = new Error('Database error');
       const mockQuery = {
         populate: jest.fn().mockReturnThis(),
         sort: jest.fn().mockReturnThis(),
@@ -217,7 +217,7 @@ describe("Product Controller - Unit Tests", () => {
         skip: jest.fn().mockRejectedValue(error),
       };
 
-      jest.spyOn(Product, "find").mockReturnValue(mockQuery);
+      jest.spyOn(Product, 'find').mockReturnValue(mockQuery);
 
       await getProducts(req, res);
 
@@ -225,20 +225,20 @@ describe("Product Controller - Unit Tests", () => {
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: false,
-          message: "Failed to fetch products",
+          message: 'Failed to fetch products',
         })
       );
     });
   });
 
-  describe("getProductById", () => {
-    it("should return single product by id", async () => {
-      const productId = "507f1f77bcf86cd799439011";
+  describe('getProductById', () => {
+    it('should return single product by id', async () => {
+      const productId = '507f1f77bcf86cd799439011';
       req.params = { id: productId };
 
       const mockProduct = {
         _id: productId,
-        title: "Test Product",
+        title: 'Test Product',
         price: 99.99,
         rating: 4.5,
       };
@@ -246,7 +246,7 @@ describe("Product Controller - Unit Tests", () => {
       const mockQuery = {
         populate: jest.fn().mockResolvedValue(mockProduct),
       };
-      jest.spyOn(Product, "findById").mockReturnValue(mockQuery);
+      jest.spyOn(Product, 'findById').mockReturnValue(mockQuery);
 
       await getProductById(req, res);
 
@@ -259,8 +259,8 @@ describe("Product Controller - Unit Tests", () => {
       );
     });
 
-    it("should return 404 for invalid ObjectId", async () => {
-      req.params = { id: "invalid-id" };
+    it('should return 404 for invalid ObjectId', async () => {
+      req.params = { id: 'invalid-id' };
 
       await getProductById(req, res);
 
@@ -268,19 +268,19 @@ describe("Product Controller - Unit Tests", () => {
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: false,
-          message: "Invalid product ID format",
+          message: 'Invalid product ID format',
         })
       );
     });
 
-    it("should return 404 for non-existent product", async () => {
-      const productId = "507f1f77bcf86cd799439011";
+    it('should return 404 for non-existent product', async () => {
+      const productId = '507f1f77bcf86cd799439011';
       req.params = { id: productId };
 
       const mockQuery = {
         populate: jest.fn().mockResolvedValue(null),
       };
-      jest.spyOn(Product, "findById").mockReturnValue(mockQuery);
+      jest.spyOn(Product, 'findById').mockReturnValue(mockQuery);
 
       await getProductById(req, res);
 
@@ -288,17 +288,17 @@ describe("Product Controller - Unit Tests", () => {
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: false,
-          message: "Product not found",
+          message: 'Product not found',
         })
       );
     });
   });
 
-  describe("updateProduct", () => {
-    it("should update product successfully", async () => {
-      const productId = "507f1f77bcf86cd799439011";
+  describe('updateProduct', () => {
+    it('should update product successfully', async () => {
+      const productId = '507f1f77bcf86cd799439011';
       const updateData = {
-        title: "Updated Product",
+        title: 'Updated Product',
         price: 149.99,
       };
 
@@ -313,7 +313,7 @@ describe("Product Controller - Unit Tests", () => {
       const mockQuery = {
         populate: jest.fn().mockResolvedValue(updatedProduct),
       };
-      jest.spyOn(Product, "findByIdAndUpdate").mockReturnValue(mockQuery);
+      jest.spyOn(Product, 'findByIdAndUpdate').mockReturnValue(mockQuery);
 
       await updateProduct(req, res);
 
@@ -325,15 +325,15 @@ describe("Product Controller - Unit Tests", () => {
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: true,
-          message: "Product updated successfully",
+          message: 'Product updated successfully',
           data: updatedProduct,
         })
       );
     });
 
-    it("should return error for invalid ObjectId", async () => {
-      req.params = { id: "invalid-id" };
-      req.body = { title: "Updated Product" };
+    it('should return error for invalid ObjectId', async () => {
+      req.params = { id: 'invalid-id' };
+      req.body = { title: 'Updated Product' };
 
       await updateProduct(req, res);
 
@@ -341,20 +341,20 @@ describe("Product Controller - Unit Tests", () => {
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: false,
-          message: "Invalid product ID format",
+          message: 'Invalid product ID format',
         })
       );
     });
 
-    it("should return 404 for non-existent product", async () => {
-      const productId = "507f1f77bcf86cd799439011";
+    it('should return 404 for non-existent product', async () => {
+      const productId = '507f1f77bcf86cd799439011';
       req.params = { id: productId };
-      req.body = { title: "Updated Product" };
+      req.body = { title: 'Updated Product' };
 
       const mockQuery = {
         populate: jest.fn().mockResolvedValue(null),
       };
-      jest.spyOn(Product, "findByIdAndUpdate").mockReturnValue(mockQuery);
+      jest.spyOn(Product, 'findByIdAndUpdate').mockReturnValue(mockQuery);
 
       await updateProduct(req, res);
 
@@ -362,24 +362,24 @@ describe("Product Controller - Unit Tests", () => {
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: false,
-          message: "Product not found",
+          message: 'Product not found',
         })
       );
     });
   });
 
-  describe("deleteProduct", () => {
-    it("should delete product successfully", async () => {
-      const productId = "507f1f77bcf86cd799439011";
+  describe('deleteProduct', () => {
+    it('should delete product successfully', async () => {
+      const productId = '507f1f77bcf86cd799439011';
       req.params = { id: productId };
 
       const deletedProduct = {
         _id: productId,
-        title: "Deleted Product",
+        title: 'Deleted Product',
       };
 
       jest
-        .spyOn(Product, "findByIdAndDelete")
+        .spyOn(Product, 'findByIdAndDelete')
         .mockResolvedValue(deletedProduct);
 
       await deleteProduct(req, res);
@@ -388,13 +388,13 @@ describe("Product Controller - Unit Tests", () => {
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: true,
-          message: "Product deleted successfully",
+          message: 'Product deleted successfully',
         })
       );
     });
 
-    it("should return error for invalid ObjectId", async () => {
-      req.params = { id: "invalid-id" };
+    it('should return error for invalid ObjectId', async () => {
+      req.params = { id: 'invalid-id' };
 
       await deleteProduct(req, res);
 
@@ -402,16 +402,16 @@ describe("Product Controller - Unit Tests", () => {
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: false,
-          message: "Invalid product ID format",
+          message: 'Invalid product ID format',
         })
       );
     });
 
-    it("should return 404 for non-existent product", async () => {
-      const productId = "507f1f77bcf86cd799439011";
+    it('should return 404 for non-existent product', async () => {
+      const productId = '507f1f77bcf86cd799439011';
       req.params = { id: productId };
 
-      jest.spyOn(Product, "findByIdAndDelete").mockResolvedValue(null);
+      jest.spyOn(Product, 'findByIdAndDelete').mockResolvedValue(null);
 
       await deleteProduct(req, res);
 
@@ -419,7 +419,7 @@ describe("Product Controller - Unit Tests", () => {
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: false,
-          message: "Product not found",
+          message: 'Product not found',
         })
       );
     });
