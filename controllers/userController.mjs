@@ -1,26 +1,26 @@
-import { User } from "../models/UserSchema.mjs";
+import { User } from '../models/UserSchema.mjs';
 
 // Get all users
 export const getUsers = async (req, res) => {
   try {
-    const users = await User.find().select("-password"); // Exclude password from response
+    const users = await User.find().select('-password'); // Exclude password from response
     res.json(users);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to fetch users" });
+  } catch (_error) {
+    res.status(500).json({ message: 'Failed to fetch users' });
   }
 };
 
 // Get user by ID
 export const getUserById = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).select("-password");
+    const user = await User.findById(req.params.id).select('-password');
     if (user) {
       res.json(user);
     } else {
-      res.status(404).json({ message: "User not found" });
+      res.status(404).json({ message: 'User not found' });
     }
-  } catch (error) {
-    res.status(500).json({ message: "Failed to fetch user" });
+  } catch (_error) {
+    res.status(500).json({ message: 'Failed to fetch user' });
   }
 };
 
@@ -41,10 +41,10 @@ export const updateUser = async (req, res) => {
         email: updatedUser.email,
       });
     } else {
-      res.status(404).json({ message: "User not found" });
+      res.status(404).json({ message: 'User not found' });
     }
-  } catch (error) {
-    res.status(500).json({ message: "Failed to update user" });
+  } catch (_error) {
+    res.status(500).json({ message: 'Failed to update user' });
   }
 };
 
@@ -56,18 +56,18 @@ export const deleteUser = async (req, res) => {
       await User.deleteOne({ _id: req.params.id });
       res.json({
         success: true,
-        message: "User removed",
+        message: 'User removed',
       });
     } else {
       res.status(404).json({
         success: false,
-        message: "User not found",
+        message: 'User not found',
       });
     }
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to delete user",
+      message: 'Failed to delete user',
       error: error.message,
     });
   }
@@ -82,15 +82,15 @@ export const updateUserAvatar = async (req, res) => {
     if (!avatar) {
       return res.status(400).json({
         success: false,
-        message: "Avatar URL is required",
+        message: 'Avatar URL is required',
       });
     }
 
-    const user = await User.findById(id).select("-password");
+    const user = await User.findById(id).select('-password');
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "User not found",
+        message: 'User not found',
       });
     }
 
@@ -99,7 +99,7 @@ export const updateUserAvatar = async (req, res) => {
 
     res.json({
       success: true,
-      message: "Avatar updated successfully",
+      message: 'Avatar updated successfully',
       data: {
         id: updatedUser._id,
         name: updatedUser.name,
@@ -110,7 +110,7 @@ export const updateUserAvatar = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to update avatar",
+      message: 'Failed to update avatar',
       error: error.message,
     });
   }
@@ -119,11 +119,11 @@ export const updateUserAvatar = async (req, res) => {
 // Get current user profile
 export const getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("-password");
+    const user = await User.findById(req.user.id).select('-password');
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "User not found",
+        message: 'User not found',
       });
     }
 
@@ -134,7 +134,7 @@ export const getProfile = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to get profile",
+      message: 'Failed to get profile',
       error: error.message,
     });
   }
@@ -149,7 +149,7 @@ export const updateProfile = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "User not found",
+        message: 'User not found',
       });
     }
 
@@ -162,7 +162,7 @@ export const updateProfile = async (req, res) => {
 
     res.json({
       success: true,
-      message: "Profile updated successfully",
+      message: 'Profile updated successfully',
       data: {
         _id: updatedUser._id,
         name: updatedUser.name,
@@ -174,7 +174,7 @@ export const updateProfile = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to update profile",
+      message: 'Failed to update profile',
       error: error.message,
     });
   }

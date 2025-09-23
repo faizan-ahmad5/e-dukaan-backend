@@ -1,10 +1,10 @@
-import logger from "./logger.mjs";
+import logger from './logger.mjs';
 
 // Simple UUID alternative until uuid package is installed
 const generateId = () => {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     const r = (Math.random() * 16) | 0;
-    const v = c == "x" ? r : (r & 0x3) | 0x8;
+    const v = c == 'x' ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 };
@@ -21,7 +21,7 @@ export class AppError extends Error {
     errorCode = null
   ) {
     super(message);
-    this.name = "AppError";
+    this.name = 'AppError';
     this.statusCode = statusCode;
     this.isOperational = isOperational;
     this.errorCode = errorCode;
@@ -36,10 +36,10 @@ export class AppError extends Error {
  * Sanitizes error messages for production
  * Prevents information disclosure while preserving debugging info in logs
  */
-export const sanitizeError = (error) => {
+export const sanitizeError = error => {
   // Always log full error details for debugging
   if (error.errorId) {
-    logger.error("Error details for debugging:", {
+    logger.error('Error details for debugging:', {
       errorId: error.errorId,
       message: error.message,
       stack: error.stack,
@@ -49,18 +49,18 @@ export const sanitizeError = (error) => {
   }
 
   // Return safe messages in production
-  if (process.env.NODE_ENV === "production") {
+  if (process.env.NODE_ENV === 'production') {
     const safeMessages = {
-      400: "Invalid request data provided",
-      401: "Authentication credentials required",
-      403: "Access to this resource is forbidden",
-      404: "The requested resource was not found",
-      409: "Resource already exists or conflicts with current state",
-      422: "The request data could not be processed",
-      429: "Too many requests, please try again later",
-      500: "An internal server error occurred",
-      502: "Service temporarily unavailable",
-      503: "Service temporarily unavailable",
+      400: 'Invalid request data provided',
+      401: 'Authentication credentials required',
+      403: 'Access to this resource is forbidden',
+      404: 'The requested resource was not found',
+      409: 'Resource already exists or conflicts with current state',
+      422: 'The request data could not be processed',
+      429: 'Too many requests, please try again later',
+      500: 'An internal server error occurred',
+      502: 'Service temporarily unavailable',
+      503: 'Service temporarily unavailable',
     };
 
     const statusCode = error.statusCode || 500;
@@ -68,83 +68,83 @@ export const sanitizeError = (error) => {
   }
 
   // In development, return the actual error message
-  return error.message || "An unexpected error occurred";
+  return error.message || 'An unexpected error occurred';
 };
 
 /**
  * Handles different types of database and application errors
  */
-export const handleSpecificErrors = (err) => {
-  let error = { ...err };
+export const handleSpecificErrors = err => {
+  let error = err;
 
   // MongoDB duplicate key error (E11000)
   if (err.code === 11000) {
-    const field = Object.keys(err.keyValue || {})[0] || "field";
-    const value = err.keyValue?.[field] || "";
+    const field = Object.keys(err.keyValue || {})[0] || 'field';
+    const value = err.keyValue?.[field] || '';
     const message = `${
       field.charAt(0).toUpperCase() + field.slice(1)
     } '${value}' already exists`;
-    error = new AppError(message, 409, true, "DUPLICATE_KEY");
+    error = new AppError(message, 409, true, 'DUPLICATE_KEY');
   }
 
   // Mongoose validation errors
-  if (err.name === "ValidationError") {
-    const errors = Object.values(err.errors).map((e) => e.message);
-    const message = `Validation failed: ${errors.join(", ")}`;
-    error = new AppError(message, 400, true, "VALIDATION_ERROR");
+  if (err.name === 'ValidationError') {
+    const errors = Object.values(err.errors).map(e => e.message);
+    const message = `Validation failed: ${errors.join(', ')}`;
+    error = new AppError(message, 400, true, 'VALIDATION_ERROR');
   }
 
   // Mongoose invalid ObjectId
-  if (err.name === "CastError" && err.kind === "ObjectId") {
+  if (err.name === 'CastError' && err.kind === 'ObjectId') {
     const message = `Invalid ${err.path}: ${err.value}`;
-    error = new AppError(message, 400, true, "INVALID_ID");
+    error = new AppError(message, 400, true, 'INVALID_ID');
   }
 
   // JWT errors
-  if (err.name === "JsonWebTokenError") {
+  if (err.name === 'JsonWebTokenError') {
     error = new AppError(
-      "Invalid authentication token",
+      'Invalid authentication token',
       401,
       true,
-      "INVALID_TOKEN"
+      'INVALID_TOKEN'
     );
   }
 
-  if (err.name === "TokenExpiredError") {
+  if (err.name === 'TokenExpiredError') {
     error = new AppError(
-      "Authentication token has expired",
+      'Authentication token has expired',
       401,
       true,
-      "TOKEN_EXPIRED"
+      'TOKEN_EXPIRED'
     );
   }
 
   // Multer file upload errors
-  if (err.code === "LIMIT_FILE_SIZE") {
+  if (err.code === 'LIMIT_FILE_SIZE') {
     error = new AppError(
-      "File size exceeds the maximum allowed limit",
+      'File size exceeds the maximum allowed limit',
       413,
       true,
-      "FILE_TOO_LARGE"
+      'FILE_TOO_LARGE'
     );
   }
 
-  if (err.code === "LIMIT_FILE_COUNT") {
+  if (err.code === 'LIMIT_FILE_COUNT') {
     error = new AppError(
-      "Too many files uploaded at once",
+      'Too many files uploaded at once',
       413,
       true,
-      "TOO_MANY_FILES"
+      'TOO_MANY_FILES'
     );
   }
 
   // Stripe payment errors
-  if (err.type === "StripeCardError") {
+  if (err.type === 'StripeCardError') {
     error = new AppError(
-      "Payment failed: " + err.message,
+      'Payment failed: ' + err.message,
       402,
       true,
-      "PAYMENT_FAILED"
+      'PAYMENT_FAILED'
     );
   }
 
@@ -162,14 +162,14 @@ export const globalErrorHandler = (err, req, res, next) => {
   // Ensure error has required properties
   if (!(error instanceof AppError)) {
     error = new AppError(
-      error.message || "Something went wrong",
+      error.message || 'Something went wrong',
       error.statusCode || 500,
       error.isOperational || false
     );
   }
 
   // Log error with request context
-  logger.error("Application Error:", {
+  logger.error('Application Error:', {
     errorId: error.errorId,
     message: error.message,
     statusCode: error.statusCode,
@@ -178,8 +178,8 @@ export const globalErrorHandler = (err, req, res, next) => {
     url: req.originalUrl,
     method: req.method,
     ip: req.ip || req.connection?.remoteAddress,
-    userAgent: req.get("User-Agent"),
-    userId: req.user?.id || "anonymous",
+    userAgent: req.get('User-Agent'),
+    userId: req.user?.id || 'anonymous',
     body: sanitizeRequestData(req.body),
     params: req.params,
     query: sanitizeRequestData(req.query),
@@ -195,7 +195,7 @@ export const globalErrorHandler = (err, req, res, next) => {
   };
 
   // Add additional info in development
-  if (process.env.NODE_ENV !== "production") {
+  if (process.env.NODE_ENV !== 'production') {
     errorResponse.error = {
       message: error.message,
       stack: error.stack,
@@ -218,36 +218,36 @@ export const globalErrorHandler = (err, req, res, next) => {
  * Async handler wrapper to catch async errors
  * Automatically passes errors to global error handler
  */
-export const asyncHandler = (fn) => (req, res, next) => {
+export const asyncHandler = fn => (req, res, next) => {
   Promise.resolve(fn(req, res, next)).catch(next);
 };
 
 /**
  * Sanitizes request data to remove sensitive information from logs
  */
-const sanitizeRequestData = (data) => {
-  if (!data || typeof data !== "object") return data;
+const sanitizeRequestData = data => {
+  if (!data || typeof data !== 'object') return data;
 
   const sanitized = { ...data };
   const sensitiveFields = [
-    "password",
-    "confirmPassword",
-    "token",
-    "refreshToken",
-    "apiKey",
-    "secret",
-    "key",
-    "authorization",
-    "auth",
-    "cardNumber",
-    "cvv",
-    "ssn",
-    "socialSecurityNumber",
+    'password',
+    'confirmPassword',
+    'token',
+    'refreshToken',
+    'apiKey',
+    'secret',
+    'key',
+    'authorization',
+    'auth',
+    'cardNumber',
+    'cvv',
+    'ssn',
+    'socialSecurityNumber',
   ];
 
-  sensitiveFields.forEach((field) => {
+  sensitiveFields.forEach(field => {
     if (sanitized[field]) {
-      sanitized[field] = "[REDACTED]";
+      sanitized[field] = '[REDACTED]';
     }
   });
 
@@ -272,88 +272,88 @@ export const createErrorResponse = (
 export const errors = {
   // Authentication errors
   invalidCredentials: () =>
-    new AppError("Invalid email or password", 401, true, "INVALID_CREDENTIALS"),
+    new AppError('Invalid email or password', 401, true, 'INVALID_CREDENTIALS'),
   tokenRequired: () =>
     new AppError(
-      "Authentication token is required",
+      'Authentication token is required',
       401,
       true,
-      "TOKEN_REQUIRED"
+      'TOKEN_REQUIRED'
     ),
   tokenInvalid: () =>
-    new AppError("Invalid or malformed token", 401, true, "TOKEN_INVALID"),
+    new AppError('Invalid or malformed token', 401, true, 'TOKEN_INVALID'),
   tokenExpired: () =>
     new AppError(
-      "Authentication token has expired",
+      'Authentication token has expired',
       401,
       true,
-      "TOKEN_EXPIRED"
+      'TOKEN_EXPIRED'
     ),
 
   // Authorization errors
-  accessDenied: () => new AppError("Access denied", 403, true, "ACCESS_DENIED"),
+  accessDenied: () => new AppError('Access denied', 403, true, 'ACCESS_DENIED'),
   adminRequired: () =>
     new AppError(
-      "Administrator privileges required",
+      'Administrator privileges required',
       403,
       true,
-      "ADMIN_REQUIRED"
+      'ADMIN_REQUIRED'
     ),
   ownershipRequired: () =>
     new AppError(
-      "You can only access your own resources",
+      'You can only access your own resources',
       403,
       true,
-      "OWNERSHIP_REQUIRED"
+      'OWNERSHIP_REQUIRED'
     ),
 
   // Resource errors
-  notFound: (resource = "Resource") =>
-    new AppError(`${resource} not found`, 404, true, "NOT_FOUND"),
-  alreadyExists: (resource = "Resource") =>
-    new AppError(`${resource} already exists`, 409, true, "ALREADY_EXISTS"),
+  notFound: (resource = 'Resource') =>
+    new AppError(`${resource} not found`, 404, true, 'NOT_FOUND'),
+  alreadyExists: (resource = 'Resource') =>
+    new AppError(`${resource} already exists`, 409, true, 'ALREADY_EXISTS'),
 
   // Validation errors
-  validationFailed: (details) =>
+  validationFailed: details =>
     new AppError(
-      "Input validation failed",
+      'Input validation failed',
       400,
       true,
-      "VALIDATION_FAILED",
+      'VALIDATION_FAILED',
       details
     ),
-  invalidInput: (field) =>
-    new AppError(`Invalid ${field} provided`, 400, true, "INVALID_INPUT"),
+  invalidInput: field =>
+    new AppError(`Invalid ${field} provided`, 400, true, 'INVALID_INPUT'),
 
   // Business logic errors
   insufficientStock: () =>
     new AppError(
-      "Insufficient stock available",
+      'Insufficient stock available',
       409,
       true,
-      "INSUFFICIENT_STOCK"
+      'INSUFFICIENT_STOCK'
     ),
-  paymentFailed: (reason) =>
-    new AppError(`Payment failed: ${reason}`, 402, true, "PAYMENT_FAILED"),
+  paymentFailed: reason =>
+    new AppError(`Payment failed: ${reason}`, 402, true, 'PAYMENT_FAILED'),
   orderNotFound: () =>
-    new AppError("Order not found", 404, true, "ORDER_NOT_FOUND"),
+    new AppError('Order not found', 404, true, 'ORDER_NOT_FOUND'),
 
   // System errors
   databaseError: () =>
-    new AppError("Database operation failed", 500, false, "DATABASE_ERROR"),
+    new AppError('Database operation failed', 500, false, 'DATABASE_ERROR'),
   externalServiceError: () =>
     new AppError(
-      "External service unavailable",
+      'External service unavailable',
       502,
       false,
-      "EXTERNAL_SERVICE_ERROR"
+      'EXTERNAL_SERVICE_ERROR'
     ),
   configurationError: () =>
     new AppError(
-      "Server configuration error",
+      'Server configuration error',
       500,
       false,
-      "CONFIGURATION_ERROR"
+      'CONFIGURATION_ERROR'
     ),
 };
 

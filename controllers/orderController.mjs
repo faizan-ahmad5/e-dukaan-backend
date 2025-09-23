@@ -1,8 +1,7 @@
-import { Order } from "../models/OrderSchema.mjs";
-import { Product } from "../models/ProductSchema.mjs";
-import { User } from "../models/UserSchema.mjs";
-import { Cart } from "../models/CartSchema.mjs";
-import mongoose from "mongoose";
+import { Order } from '../models/OrderSchema.mjs';
+import { Product } from '../models/ProductSchema.mjs';
+import { Cart } from '../models/CartSchema.mjs';
+import mongoose from 'mongoose';
 
 // Create a new order
 export const createOrder = async (req, res) => {
@@ -24,13 +23,13 @@ export const createOrder = async (req, res) => {
     if (!items || items.length === 0) {
       const userObjectId = new mongoose.Types.ObjectId(req.user.id);
       const cart = await Cart.findOne({ user: userObjectId }).populate(
-        "products.product"
+        'products.product'
       );
 
       if (!cart || cart.products.length === 0) {
         return res.status(400).json({
           success: false,
-          message: "No items in cart to create order",
+          message: 'No items in cart to create order',
           timestamp: new Date().toISOString(),
         });
       }
@@ -41,7 +40,7 @@ export const createOrder = async (req, res) => {
 
         // Check inventory (skip in test environment)
         if (
-          process.env.NODE_ENV !== "test" &&
+          process.env.NODE_ENV !== 'test' &&
           product.stock < cartItem.quantity
         ) {
           return res.status(400).json({
@@ -66,7 +65,7 @@ export const createOrder = async (req, res) => {
         itemsPrice += cartItem.priceAtAdd * cartItem.quantity;
 
         // Update product stock (skip in test environment)
-        if (process.env.NODE_ENV !== "test") {
+        if (process.env.NODE_ENV !== 'test') {
           product.stock -= cartItem.quantity;
           await product.save();
         }
@@ -81,7 +80,7 @@ export const createOrder = async (req, res) => {
         if (!item.product || !item.product.match(/^[0-9a-fA-F]{24}$/)) {
           return res.status(400).json({
             success: false,
-            message: "Invalid product ID format",
+            message: 'Invalid product ID format',
             timestamp: new Date().toISOString(),
           });
         }
@@ -98,7 +97,7 @@ export const createOrder = async (req, res) => {
         }
 
         // Check inventory (skip in test environment)
-        if (process.env.NODE_ENV !== "test" && product.stock < item.quantity) {
+        if (process.env.NODE_ENV !== 'test' && product.stock < item.quantity) {
           return res.status(400).json({
             success: false,
             message: `Insufficient stock for product: ${product.title}`,
@@ -121,7 +120,7 @@ export const createOrder = async (req, res) => {
         itemsPrice += product.price * item.quantity;
 
         // Update product stock (skip in test environment)
-        if (process.env.NODE_ENV !== "test") {
+        if (process.env.NODE_ENV !== 'test') {
           product.stock -= item.quantity;
           await product.save();
         }
@@ -142,7 +141,7 @@ export const createOrder = async (req, res) => {
       billingAddress: shippingAddress, // Use shipping address as billing address if not provided
       paymentInfo: {
         method: paymentMethod,
-        status: "pending",
+        status: 'pending',
       },
       pricing: {
         itemsPrice,
@@ -150,7 +149,7 @@ export const createOrder = async (req, res) => {
         taxPrice,
         totalPrice: totalPrice || itemsPrice + shippingPrice + taxPrice,
       },
-      orderStatus: "pending",
+      orderStatus: 'pending',
     });
 
     const savedOrder = await order.save();
@@ -177,14 +176,14 @@ export const createOrder = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "Order created successfully",
+      message: 'Order created successfully',
       data: orderResponse,
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to create order",
+      message: 'Failed to create order',
       error: error.message,
       timestamp: new Date().toISOString(),
     });
@@ -198,8 +197,8 @@ export const getAllOrders = async (req, res) => {
       status,
       page = 1,
       limit = 10,
-      sort = "createdAt",
-      order = "desc",
+      sort = 'createdAt',
+      order = 'desc',
     } = req.query;
 
     const filter = {};
@@ -207,19 +206,19 @@ export const getAllOrders = async (req, res) => {
 
     // Whitelist allowed sort fields to prevent injection
     const allowedSortFields = [
-      "createdAt",
-      "updatedAt",
-      "totalAmount",
-      "status",
+      'createdAt',
+      'updatedAt',
+      'totalAmount',
+      'status',
     ];
-    const sanitizedSort = allowedSortFields.includes(sort) ? sort : "createdAt";
+    const sanitizedSort = allowedSortFields.includes(sort) ? sort : 'createdAt';
 
-    const sortOrder = order === "desc" ? -1 : 1;
+    const sortOrder = order === 'desc' ? -1 : 1;
     const skip = (page - 1) * limit;
 
     const orders = await Order.find(filter)
-      .populate("user", "name email")
-      .populate("items.product", "title image price")
+      .populate('user', 'name email')
+      .populate('items.product', 'title image price')
       .sort({ [sanitizedSort]: sortOrder })
       .skip(skip)
       .limit(Number(limit));
@@ -240,7 +239,7 @@ export const getAllOrders = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to fetch orders",
+      message: 'Failed to fetch orders',
       error: error.message,
     });
   }
@@ -255,7 +254,7 @@ export const getUserOrders = async (req, res) => {
     if (!req.user.id || !req.user.id.toString().match(/^[0-9a-fA-F]{24}$/)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid user session",
+        message: 'Invalid user session',
       });
     }
 
@@ -265,7 +264,7 @@ export const getUserOrders = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const orders = await Order.find(filter)
-      .populate("items.product", "title image price")
+      .populate('items.product', 'title image price')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(Number(limit));
@@ -284,7 +283,7 @@ export const getUserOrders = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to fetch user orders",
+      message: 'Failed to fetch user orders',
       error: error.message,
     });
   }
@@ -297,31 +296,31 @@ export const getOrderById = async (req, res) => {
     if (!req.params.id || !req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid order ID format",
+        message: 'Invalid order ID format',
       });
     }
 
     const order = await Order.findById(
       new mongoose.Types.ObjectId(req.params.id)
     )
-      .populate("user", "name email")
-      .populate("items.product", "title image price brand category");
+      .populate('user', 'name email')
+      .populate('items.product', 'title image price brand category');
 
     if (!order) {
       return res.status(404).json({
         success: false,
-        message: "Order not found",
+        message: 'Order not found',
       });
     }
 
     // Check if user owns the order or is admin
     if (
       order.user._id.toString() !== req.user.id &&
-      req.user.role !== "admin"
+      req.user.role !== 'admin'
     ) {
       return res.status(403).json({
         success: false,
-        message: "Access denied",
+        message: 'Access denied',
       });
     }
 
@@ -332,7 +331,7 @@ export const getOrderById = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to fetch order",
+      message: 'Failed to fetch order',
       error: error.message,
     });
   }
@@ -343,17 +342,17 @@ export const updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;
     const validStatuses = [
-      "pending",
-      "processing",
-      "shipped",
-      "delivered",
-      "cancelled",
+      'pending',
+      'processing',
+      'shipped',
+      'delivered',
+      'cancelled',
     ];
 
     if (!validStatuses.includes(status)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid order status",
+        message: 'Invalid order status',
       });
     }
 
@@ -364,14 +363,14 @@ export const updateOrderStatus = async (req, res) => {
     if (!order) {
       return res.status(404).json({
         success: false,
-        message: "Order not found",
+        message: 'Order not found',
       });
     }
 
     order.status = status;
 
     // Update delivery date if delivered
-    if (status === "delivered") {
+    if (status === 'delivered') {
       order.deliveredAt = new Date();
     }
 
@@ -386,13 +385,13 @@ export const updateOrderStatus = async (req, res) => {
 
     res.json({
       success: true,
-      message: "Order status updated successfully",
+      message: 'Order status updated successfully',
       data: order,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to update order status",
+      message: 'Failed to update order status',
       error: error.message,
     });
   }
@@ -408,7 +407,7 @@ export const cancelOrder = async (req, res) => {
     if (!order) {
       return res.status(404).json({
         success: false,
-        message: "Order not found",
+        message: 'Order not found',
       });
     }
 
@@ -416,15 +415,15 @@ export const cancelOrder = async (req, res) => {
     if (order.user.toString() !== req.user.id) {
       return res.status(403).json({
         success: false,
-        message: "Access denied",
+        message: 'Access denied',
       });
     }
 
     // Check if order can be cancelled
-    if (order.status === "delivered" || order.status === "cancelled") {
+    if (order.status === 'delivered' || order.status === 'cancelled') {
       return res.status(400).json({
         success: false,
-        message: "Order cannot be cancelled",
+        message: 'Order cannot be cancelled',
       });
     }
 
@@ -440,24 +439,24 @@ export const cancelOrder = async (req, res) => {
       }
     }
 
-    order.status = "cancelled";
+    order.status = 'cancelled';
     order.statusHistory.push({
-      status: "cancelled",
+      status: 'cancelled',
       timestamp: new Date(),
-      note: "Cancelled by user",
+      note: 'Cancelled by user',
     });
 
     await order.save();
 
     res.json({
       success: true,
-      message: "Order cancelled successfully",
+      message: 'Order cancelled successfully',
       data: order,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to cancel order",
+      message: 'Failed to cancel order',
       error: error.message,
     });
   }
@@ -467,18 +466,18 @@ export const cancelOrder = async (req, res) => {
 export const getOrderStats = async (req, res) => {
   try {
     const totalOrders = await Order.countDocuments();
-    const pendingOrders = await Order.countDocuments({ status: "pending" });
+    const pendingOrders = await Order.countDocuments({ status: 'pending' });
     const processingOrders = await Order.countDocuments({
-      status: "processing",
+      status: 'processing',
     });
-    const shippedOrders = await Order.countDocuments({ status: "shipped" });
-    const deliveredOrders = await Order.countDocuments({ status: "delivered" });
-    const cancelledOrders = await Order.countDocuments({ status: "cancelled" });
+    const shippedOrders = await Order.countDocuments({ status: 'shipped' });
+    const deliveredOrders = await Order.countDocuments({ status: 'delivered' });
+    const cancelledOrders = await Order.countDocuments({ status: 'cancelled' });
 
     // Calculate total revenue
     const revenueResult = await Order.aggregate([
-      { $match: { status: { $ne: "cancelled" } } },
-      { $group: { _id: null, totalRevenue: { $sum: "$totalPrice" } } },
+      { $match: { status: { $ne: 'cancelled' } } },
+      { $group: { _id: null, totalRevenue: { $sum: '$totalPrice' } } },
     ]);
 
     const totalRevenue =
@@ -486,7 +485,7 @@ export const getOrderStats = async (req, res) => {
 
     // Get recent orders
     const recentOrders = await Order.find()
-      .populate("user", "name email")
+      .populate('user', 'name email')
       .sort({ createdAt: -1 })
       .limit(5);
 
@@ -508,7 +507,7 @@ export const getOrderStats = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to fetch order statistics",
+      message: 'Failed to fetch order statistics',
       error: error.message,
     });
   }

@@ -1,4 +1,4 @@
-import { Product } from "../models/ProductSchema.mjs";
+import { Product } from '../models/ProductSchema.mjs';
 
 // CREATE a new product
 export const createProduct = async (req, res) => {
@@ -28,7 +28,7 @@ export const createProduct = async (req, res) => {
     const newProduct = new Product({
       title,
       description,
-      image: image || (productImages.length > 0 ? productImages[0] : ""),
+      image: image || (productImages.length > 0 ? productImages[0] : ''),
       images: productImages,
       price,
       category,
@@ -49,13 +49,13 @@ export const createProduct = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "Product created successfully",
+      message: 'Product created successfully',
       data: savedProduct,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to create product",
+      message: 'Failed to create product',
       error: error.message,
     });
   }
@@ -72,26 +72,26 @@ export const getProducts = async (req, res) => {
       inStock,
       page = 1,
       limit = 10,
-      sort = "createdAt",
-      order = "desc",
+      sort = 'createdAt',
+      order = 'desc',
     } = req.query;
 
     // Build filter object
     const filter = {};
 
-    if (category) filter.category = { $regex: category, $options: "i" };
-    if (brand) filter.brand = { $regex: brand, $options: "i" };
+    if (category) filter.category = { $regex: category, $options: 'i' };
+    if (brand) filter.brand = { $regex: brand, $options: 'i' };
     if (minPrice || maxPrice) {
       filter.price = {};
       if (minPrice) filter.price.$gte = Number(minPrice);
       if (maxPrice) filter.price.$lte = Number(maxPrice);
     }
     if (inStock !== undefined) {
-      filter["inventory.inStock"] = inStock === "true";
+      filter['inventory.inStock'] = inStock === 'true';
     }
 
     // Build sort object
-    const sortOrder = order === "desc" ? -1 : 1;
+    const sortOrder = order === 'desc' ? -1 : 1;
     const sortObj = { [sort]: sortOrder };
 
     // Calculate pagination
@@ -118,7 +118,7 @@ export const getProducts = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to fetch products",
+      message: 'Failed to fetch products',
       error: error.message,
     });
   }
@@ -137,14 +137,14 @@ export const getProductById = async (req, res) => {
     } else {
       res.status(404).json({
         success: false,
-        message: "Product not found",
+        message: 'Product not found',
         timestamp: new Date().toISOString(),
       });
     }
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to fetch product",
+      message: 'Failed to fetch product',
       error: error.message,
       timestamp: new Date().toISOString(),
     });
@@ -167,10 +167,10 @@ export const updateProduct = async (req, res) => {
       const updatedProduct = await product.save();
       res.json(updatedProduct);
     } else {
-      res.status(404).json({ message: "Product not found" });
+      res.status(404).json({ message: 'Product not found' });
     }
-  } catch (error) {
-    res.status(500).json({ message: "Failed to update product" });
+  } catch (_error) {
+    res.status(500).json({ message: 'Failed to update product' });
   }
 };
 
@@ -180,14 +180,14 @@ export const deleteProduct = async (req, res) => {
     const product = await Product.findById(req.params.id);
     if (product) {
       await Product.findByIdAndDelete(req.params.id);
-      res.json({ message: "Product removed" });
+      res.json({ message: 'Product removed' });
     } else {
-      res.status(404).json({ message: "Product not found" });
+      res.status(404).json({ message: 'Product not found' });
     }
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to delete product",
+      message: 'Failed to delete product',
       error: error.message,
     });
   }
@@ -203,7 +203,7 @@ export const updateProductImages = async (req, res) => {
     if (!product) {
       return res.status(404).json({
         success: false,
-        message: "Product not found",
+        message: 'Product not found',
       });
     }
 
@@ -225,7 +225,7 @@ export const updateProductImages = async (req, res) => {
 
     res.json({
       success: true,
-      message: "Product images updated successfully",
+      message: 'Product images updated successfully',
       data: {
         id: updatedProduct._id,
         image: updatedProduct.image,
@@ -235,7 +235,7 @@ export const updateProductImages = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to update product images",
+      message: 'Failed to update product images',
       error: error.message,
     });
   }
@@ -250,7 +250,7 @@ export const addProductImage = async (req, res) => {
     if (!imageUrl) {
       return res.status(400).json({
         success: false,
-        message: "Image URL is required",
+        message: 'Image URL is required',
       });
     }
 
@@ -258,7 +258,7 @@ export const addProductImage = async (req, res) => {
     if (!product) {
       return res.status(404).json({
         success: false,
-        message: "Product not found",
+        message: 'Product not found',
       });
     }
 
@@ -276,7 +276,7 @@ export const addProductImage = async (req, res) => {
 
     res.json({
       success: true,
-      message: "Image added to product successfully",
+      message: 'Image added to product successfully',
       data: {
         id: product._id,
         image: product.image,
@@ -286,7 +286,7 @@ export const addProductImage = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to add product image",
+      message: 'Failed to add product image',
       error: error.message,
     });
   }
@@ -301,23 +301,23 @@ export const removeProductImage = async (req, res) => {
     if (!product) {
       return res.status(404).json({
         success: false,
-        message: "Product not found",
+        message: 'Product not found',
       });
     }
 
     // Remove image from images array
-    product.images = product.images.filter((img) => img !== imageUrl);
+    product.images = product.images.filter(img => img !== imageUrl);
 
     // If removed image was the main image, set new main image
     if (product.image === imageUrl) {
-      product.image = product.images.length > 0 ? product.images[0] : "";
+      product.image = product.images.length > 0 ? product.images[0] : '';
     }
 
     await product.save();
 
     res.json({
       success: true,
-      message: "Image removed from product successfully",
+      message: 'Image removed from product successfully',
       data: {
         id: product._id,
         image: product.image,
@@ -327,7 +327,7 @@ export const removeProductImage = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to remove product image",
+      message: 'Failed to remove product image',
       error: error.message,
     });
   }
