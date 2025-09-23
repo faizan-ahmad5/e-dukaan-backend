@@ -4,10 +4,6 @@
   <h2>🛒 Production-Ready E-Commerce Solution</h2>
   <p><em>A robust, scalable, and secure e-commerce backend built with modern technologies</em></p>
   
-  [![CI/CD Pipeline](https://github.com/faizan-ahmad5/e-dukaan-backend/workflows/CI/CD%20Pipeline/badge.svg)](https://github.com/faizan-ahmad5/e-dukaan-backend/actions)
-  [![CodeQL](https://github.com/faizan-ahmad5/e-dukaan-backend/workflows/CodeQL/badge.svg)](https://github.com/faizan-ahmad5/e-dukaan-backend/security/code-scanning)
-  [![codecov](https://codecov.io/gh/faizan-ahmad5/e-dukaan-backend/branch/main/graph/badge.svg)](https://codecov.io/gh/faizan-ahmad5/e-dukaan-backend)
-  
   [![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org/)
   [![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green.svg)](https://www.mongodb.com/)
   [![Express.js](https://img.shields.io/badge/Express.js-4.21-blue.svg)](https://expressjs.com/)
@@ -28,13 +24,12 @@ E-Dukaan is an enterprise-grade e-commerce backend API designed for modern web a
 - 📱 **Frontend Ready**: Standardized APIs perfect for React, Vue, Angular, or any frontend framework
 - 🌍 **Environment Flexible**: Dev/staging/production configurations with validation
 - 📧 **Email Integration**: Complete email system for verification, notifications, and marketing
-- 🛠️ **CI/CD Ready**: Professional DevOps pipeline with automated testing and deployment
 
 ---
 
 ## 🏗️ **Architecture**
 
-```
+````
 ┌─────────────────────────────────────────────────────────┐
 │                   Frontend Applications                  │
 │          (React, Vue, Angular, Mobile Apps)             │
@@ -53,17 +48,16 @@ E-Dukaan is an enterprise-grade e-commerce backend API designed for modern web a
                       │
                       ▼
 ┌─────────────────────────────────────────────────────────┐
-│       MongoDB Atlas │ Redis │ Stripe │ Email Services   │
-└─────────────────────────────────────────────────────────┘
-```
-
+│         MongoDB Atlas │ Stripe │ Email Services         │
+└──────────────────────────────────────────────────────────
 ---
 
 ## 🚀 **Quick Start**
 
 ### Prerequisites
+
 - Node.js 18+ and npm
-- MongoDB (local or Atlas)
+- MongoDB Atlas account (or local MongoDB)
 - Git
 
 ### Installation
@@ -80,33 +74,24 @@ npm install
 cp .env.example .env
 
 # Configure your environment variables
-# Edit .env file with your database URL, JWT secret, email settings, etc.
+# Edit .env file with your MongoDB URI, JWT secret, email settings, etc.
 
 # Seed the database (optional)
 npm run db:seed
 
 # Start development server
 npm run dev
-```
 
-### Docker Setup (Recommended)
-
-```bash
-# Build and run with Docker Compose
-npm run dev:docker
-
-# This starts:
-# - MongoDB container
-# - Redis container
-# - Node.js application
-# - Mongo Express (database admin)
-```
+# Or start in production mode
+npm start
+````
 
 ---
 
 ## 🏪 **Core Features**
 
 ### 🔐 Authentication & Authorization
+
 - JWT-based authentication
 - Role-based access control (Admin, User)
 - Email verification system
@@ -114,12 +99,14 @@ npm run dev:docker
 - Rate limiting and brute force protection
 
 ### 👥 User Management
+
 - User registration and profile management
 - Email verification workflow
 - Secure password handling with bcrypt
 - User roles and permissions
 
 ### 📦 Product Management
+
 - CRUD operations for products
 - Category and subcategory management
 - Image upload and processing with Sharp
@@ -127,131 +114,44 @@ npm run dev:docker
 - Inventory management
 
 ### 🛒 Shopping Cart
+
 - Add/remove products from cart
 - Quantity management
 - Cart persistence
 - Price calculations
 
 ### 📝 Order Management
+
 - Order creation and tracking
 - Order status updates
 - Order history
 - Invoice generation
 
 ### 💳 Payment Integration
+
 - Stripe payment processing
 - Payment intent creation
 - Webhook handling for payment events
 - Refund management
 
 ### ⭐ Reviews & Ratings
+
 - Product reviews and ratings
 - Review moderation
 - Rating aggregation
 
 ### ❤️ Wishlist
+
 - Add/remove products to/from wishlist
 - Wishlist management
 - Share wishlist functionality
 
 ---
 
-## 🛠️ **CI/CD Pipeline**
-
-### Pipeline Architecture
-```
-Dev → Push → Tests+Scans → Stage → Manual QA → Prod → Monitor
-```
-
-### 📋 Pipeline Stages
-
-#### 1. **Development (Local)**
-- ✅ Write & test features locally
-- ✅ Run unit/integration tests with `npm test`
-- ✅ Check coverage: `npm test -- --coverage`
-- ✅ Security scan with `npm audit`
-- ✅ Linting & style checks with `eslint` and `prettier`
-
-#### 2. **CI/CD Automation**
-- ✅ GitHub Actions runs on every push/PR
-- ✅ Install dependencies & run tests
-- ✅ CodeQL security scanning
-- ✅ Upload test coverage to Codecov
-- ✅ Docker image build & vulnerability scan
-- ✅ Only merge if all checks pass ✅
-
-#### 3. **Staging Deployment**
-- ✅ Auto-deploy develop branch to staging
-- ✅ Separate staging database with test data
-- ✅ End-to-end tests with Playwright
-- ✅ QA validation of all user flows
-
-#### 4. **Production Deployment**
-- ✅ Manual approval step required
-- ✅ Production database & environment variables
-- ✅ Scalable configuration & monitoring
-- ✅ Automatic rollback on failure
-
-#### 5. **Post-Deployment Monitoring**
-- ✅ Health checks & uptime monitoring
-- ✅ Error tracking with Sentry
-- ✅ Performance monitoring
-- ✅ Business metrics tracking
-
----
-
-## 🧪 **Testing Strategy**
-
-### Test Suites Overview
-E-Dukaan implements a comprehensive 8-phase testing strategy covering all aspects of software quality assurance.
-
-#### 🔬 **Unit Tests**
-```bash
-npm run test:unit
-```
-- **Framework**: Jest with ES6 modules
-- **Coverage**: 85%+ line coverage
-- **Scope**: Controllers, middleware, utilities, models
-- **Mocking**: Comprehensive service mocking
-
-#### 🔗 **Integration Tests**
-```bash
-npm run test:integration
-```
-- **Framework**: Supertest + Jest
-- **Database**: MongoDB with test data
-- **Coverage**: All API endpoints
-- **Validation**: Authentication & data persistence
-
-#### 🌐 **End-to-End Tests**
-```bash
-npm run test:e2e
-```
-- **Framework**: Playwright
-- **Browsers**: Chrome, Firefox, Safari + Mobile
-- **Scenarios**: Complete user journeys
-- **Results**: 192 tests - 100% pass rate
-
-#### ⚡ **Performance Tests**
-```bash
-npm run test:performance
-```
-- **Load Testing**: High concurrent request testing
-- **Response Time**: <200ms for most endpoints
-- **Memory Usage**: Efficient resource management
-- **Database**: Query optimization validation
-
-### Test Coverage Metrics
-- **Unit Tests**: 88% coverage
-- **Integration Tests**: 95% API coverage
-- **E2E Tests**: 100% user journey coverage
-- **Performance**: All endpoints <500ms response time
-
----
-
 ## 📊 **API Documentation**
 
 ### Base URL
+
 ```
 Development: http://localhost:5000/api
 Production: https://your-domain.com/api
@@ -259,39 +159,108 @@ Production: https://your-domain.com/api
 
 ### Core Endpoints
 
-#### Authentication
+#### System
+
 ```bash
-POST /api/auth/register     # User registration
-POST /api/auth/login        # User login
-POST /api/auth/verify-email # Email verification
-POST /api/auth/forgot-password # Password reset request
-POST /api/auth/reset-password  # Password reset
+GET    /                            # API welcome message
+GET    /health                      # Health check endpoint
+GET    /docs                        # API documentation
+```
+
+#### Authentication
+
+```bash
+POST /api/auth/register              # User registration
+POST /api/auth/login                 # User login
+GET  /api/auth/verify-email/:token   # Email verification
+POST /api/auth/resend-verification   # Resend verification email
+POST /api/auth/forgot-password       # Password reset request
+POST /api/auth/reset-password/:token # Password reset
+GET  /api/auth/test-email           # Test email configuration
 ```
 
 #### Products
+
 ```bash
-GET    /api/products        # Get all products
-GET    /api/products/:id    # Get product by ID
-POST   /api/products        # Create product (Admin)
-PUT    /api/products/:id    # Update product (Admin)
-DELETE /api/products/:id    # Delete product (Admin)
+GET    /api/products                    # Get all products
+GET    /api/products/:id                # Get product by ID
+POST   /api/products                    # Create product (Admin)
+PUT    /api/products/:id                # Update product (Admin)
+DELETE /api/products/:id                # Delete product (Admin)
+PUT    /api/products/:id/images         # Update product images (Admin)
+POST   /api/products/:id/images         # Add product image (Admin)
+DELETE /api/products/:id/images/:imageUrl # Remove product image (Admin)
 ```
 
 #### Cart & Orders
+
 ```bash
-GET    /api/cart           # Get user cart
-POST   /api/cart           # Add to cart
-PUT    /api/cart/:itemId   # Update cart item
-DELETE /api/cart/:itemId   # Remove from cart
-POST   /api/orders         # Create order
-GET    /api/orders         # Get user orders
+GET    /api/cart                    # Get user cart
+POST   /api/cart                    # Add to cart
+POST   /api/cart/add               # Alternative add to cart
+PUT    /api/cart                    # Update cart
+DELETE /api/cart/remove/:productId  # Remove from cart
+DELETE /api/cart/clear              # Clear cart
+POST   /api/orders                  # Create order
+GET    /api/orders                  # Get user orders (or all for admin)
+GET    /api/orders/my-orders        # Get user's orders
+GET    /api/orders/stats            # Get order statistics (Admin)
+GET    /api/orders/:id              # Get order by ID
+PUT    /api/orders/:id/status       # Update order status (Admin)
+PUT    /api/orders/:id/cancel       # Cancel order
 ```
 
 #### Payments
+
 ```bash
-POST   /api/payments/create-intent  # Create payment intent
-POST   /api/payments/confirm        # Confirm payment
-POST   /api/payments/webhook        # Stripe webhook
+POST   /api/payment                 # Create Stripe checkout session
+```
+
+#### Users
+
+```bash
+GET    /api/users                   # Get all users (Admin)
+GET    /api/users/profile/me        # Get current user profile
+PUT    /api/users/profile           # Update user profile
+GET    /api/users/:id               # Get user by ID (Admin)
+PUT    /api/users/:id               # Update user by ID (Admin)
+DELETE /api/users/:id               # Delete user by ID (Admin)
+```
+
+#### Reviews
+
+```bash
+POST   /api/reviews                 # Create new review
+GET    /api/reviews                 # Get all reviews (Admin)
+GET    /api/reviews/my-reviews      # Get user's reviews
+GET    /api/reviews/product/:productId # Get reviews for product
+PUT    /api/reviews/:id             # Update review
+DELETE /api/reviews/:id             # Delete review (Admin)
+POST   /api/reviews/:id/moderate    # Moderate review (Admin)
+POST   /api/reviews/:id/helpful     # Mark review as helpful
+```
+
+#### Wishlist
+
+```bash
+GET    /api/wishlist                # Get user's wishlist
+POST   /api/wishlist                # Add to wishlist
+POST   /api/wishlist/add            # Alternative add to wishlist
+DELETE /api/wishlist/remove/:productId # Remove from wishlist
+DELETE /api/wishlist/clear          # Clear wishlist
+POST   /api/wishlist/move-to-cart/:productId # Move to cart
+GET    /api/wishlist/stats          # Get wishlist statistics
+GET    /api/wishlist/check/:productId # Check if product in wishlist
+POST   /api/wishlist/check-multiple # Check multiple products
+```
+
+#### Images
+
+```bash
+POST   /api/images/upload/product   # Upload product image
+POST   /api/images/upload/avatar    # Upload user avatar
+POST   /api/images/upload/review    # Upload review image
+DELETE /api/images/:type/:filename  # Delete uploaded image
 ```
 
 ---
@@ -299,6 +268,7 @@ POST   /api/payments/webhook        # Stripe webhook
 ## 🔒 **Security Features**
 
 ### Multi-Layer Security
+
 - **Authentication**: JWT tokens with secure secrets
 - **Authorization**: Role-based access control
 - **Rate Limiting**: Multiple tiers (5-1000 requests/15min)
@@ -310,6 +280,7 @@ POST   /api/payments/webhook        # Stripe webhook
 - **Password Security**: bcrypt with salt rounds
 
 ### Security Best Practices
+
 - Environment variable validation
 - Secure session management
 - Password complexity requirements
@@ -322,6 +293,7 @@ POST   /api/payments/webhook        # Stripe webhook
 ## 🌍 **Environment Configuration**
 
 ### Required Environment Variables
+
 ```bash
 # Server Configuration
 NODE_ENV=development
@@ -347,12 +319,10 @@ FRONTEND_URL=http://localhost:3000
 # Stripe Configuration
 STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
 STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key
-
-# Optional: Redis for caching
-REDIS_URL=redis://localhost:6379
 ```
 
 ### Environment Validation
+
 The application validates all required environment variables on startup and provides helpful error messages for missing or invalid configurations.
 
 ---
@@ -362,11 +332,13 @@ The application validates all required environment variables on startup and prov
 ### Deployment Options
 
 1. **Render** (Recommended for beginners)
+
    - Easy setup with GitHub integration
    - Free tier available
    - Auto-scaling
 
 2. **Railway** (Developer-friendly)
+
    - Git-based deployment
    - Good free tier
    - Simple environment management
@@ -377,25 +349,25 @@ The application validates all required environment variables on startup and prov
    - Advanced monitoring
 
 ### Quick Deploy to Render
+
 1. Fork this repository
 2. Connect to Render
 3. Set environment variables
 4. Deploy automatically
-
-For detailed deployment instructions, see [DEPLOYMENT-GUIDE.md](DEPLOYMENT-GUIDE.md).
 
 ---
 
 ## 📈 **Performance & Monitoring**
 
 ### Performance Optimizations
+
 - Database query optimization with indexes
 - Middleware efficiency
 - Response compression
-- Caching strategies with Redis
 - Image optimization with Sharp
 
 ### Monitoring Setup
+
 - **Health Checks**: `/health` endpoint with database validation
 - **Error Tracking**: Sentry integration ready
 - **Uptime Monitoring**: UptimeRobot configuration
@@ -410,34 +382,11 @@ For detailed deployment instructions, see [DEPLOYMENT-GUIDE.md](DEPLOYMENT-GUIDE
 # Development
 npm run dev              # Start development server with nodemon
 npm run dev:debug        # Start with debugging enabled
-npm run dev:docker       # Start with Docker Compose
-
-# Testing
-npm test                 # Run all tests (unit + integration + e2e)
-npm run test:unit        # Run unit tests only
-npm run test:integration # Run integration tests only
-npm run test:e2e         # Run end-to-end tests
-npm run test:performance # Run performance tests
-npm run test:coverage    # Generate coverage report
-
-# Code Quality
-npm run lint             # Run ESLint with auto-fix
-npm run lint:check       # Check linting without fixing
-npm run format           # Format code with Prettier
-npm run format:check     # Check formatting
-
-# Security
-npm run security:audit   # Run npm audit
-npm run security:snyk    # Run Snyk security scan
+npm start                # Production server start
 
 # Database
 npm run db:seed          # Seed database with sample data
 npm run db:reset         # Reset database (non-production)
-
-# Deployment
-npm run docker:build     # Build Docker image
-npm run docker:run       # Run Docker container
-npm start                # Production server start
 ```
 
 ---
@@ -471,15 +420,8 @@ e-dukaan-backend/
 │   ├── logger.mjs          # Winston logger
 │   ├── emailService.mjs    # Email utilities
 │   └── apiHelpers.mjs      # API response helpers
-├── tests/                  # Test suites
-│   ├── unit/               # Unit tests
-│   ├── integration/        # Integration tests
-│   └── e2e/                # End-to-end tests
-├── scripts/                # Database and deployment scripts
+├── scripts/                # Database scripts
 ├── uploads/                # File upload directories
-├── .github/workflows/      # CI/CD pipeline
-├── Dockerfile              # Docker configuration
-├── docker-compose.yml      # Multi-service setup
 └── server.mjs              # Application entry point
 ```
 
@@ -488,19 +430,17 @@ e-dukaan-backend/
 ## 🤝 **Contributing**
 
 ### Development Workflow
+
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/amazing-feature`
 3. Make your changes
-4. Run tests: `npm test`
-5. Run linting: `npm run lint`
-6. Commit your changes: `git commit -m 'Add amazing feature'`
-7. Push to the branch: `git push origin feature/amazing-feature`
-8. Open a Pull Request
+4. Commit your changes: `git commit -m 'Add amazing feature'`
+5. Push to the branch: `git push origin feature/amazing-feature`
+6. Open a Pull Request
 
 ### Code Standards
-- Follow ESLint configuration
-- Use Prettier for formatting
-- Write tests for new features
+
+- Write clean, readable code
 - Update documentation as needed
 - Follow conventional commit messages
 
@@ -509,11 +449,14 @@ e-dukaan-backend/
 ## 📞 **Support & Contact**
 
 ### Developer
+
 **Faizan Ahmad**
+
 - Email: [fa3n20004@gmail.com](mailto:fa3n20004@gmail.com)
 - GitHub: [@faizan-ahmad5](https://github.com/faizan-ahmad5)
 
 ### Issues & Support
+
 - 🐛 **Bug Reports**: [GitHub Issues](https://github.com/faizan-ahmad5/e-dukaan-backend/issues)
 - 💡 **Feature Requests**: [GitHub Discussions](https://github.com/faizan-ahmad5/e-dukaan-backend/discussions)
 - 📧 **Email Support**: fa3n20004@gmail.com
@@ -529,33 +472,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🎯 **Roadmap**
 
 ### Current Version (v1.0.0)
+
 - ✅ Core e-commerce functionality
 - ✅ Authentication & authorization
 - ✅ Payment processing with Stripe
 - ✅ Email notifications
-- ✅ Comprehensive testing suite
-- ✅ CI/CD pipeline with GitHub Actions
 - ✅ Production deployment ready
-
-### Upcoming Features (v1.1.0)
-- [ ] Real-time notifications with Socket.io
-- [ ] Advanced analytics dashboard
-- [ ] Multi-vendor marketplace support
-- [ ] Advanced caching with Redis
-- [ ] Mobile API optimizations
-- [ ] Inventory management system
-- [ ] Coupon and discount system
-- [ ] Advanced search with Elasticsearch
-
-### Future Enhancements (v2.0.0)
-- [ ] Microservices architecture
-- [ ] GraphQL API support
-- [ ] Machine learning recommendations
-- [ ] Multi-language support
-- [ ] Advanced reporting system
-- [ ] Third-party integrations (Amazon, eBay)
-
----
 
 <div align="center">
   <h3>🚀 Ready to build amazing e-commerce experiences?</h3>
@@ -563,7 +485,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
     <a href="https://github.com/faizan-ahmad5/e-dukaan-backend/fork">Fork this repo</a> and start building today!
   </p>
   
-  <p>
-    <strong>Made with ❤️ by <a href="https://github.com/faizan-ahmad5">Faizan Ahmad</a></strong>
-  </p>
 </div>
