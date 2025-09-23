@@ -50,7 +50,8 @@ E-Dukaan is an enterprise-grade e-commerce backend API designed for modern web a
 ┌─────────────────────────────────────────────────────────┐
 │         MongoDB Atlas │ Stripe │ Email Services         │
 └──────────────────────────────────────────────────────────
----
+
+````
 
 ## 🚀 **Quick Start**
 
@@ -457,9 +458,7 @@ e-dukaan-backend/
 
 ### Issues & Support
 
-- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/faizan-ahmad5/e-dukaan-backend/issues)
-- 💡 **Feature Requests**: [GitHub Discussions](https://github.com/faizan-ahmad5/e-dukaan-backend/discussions)
-- 📧 **Email Support**: fa3n20004@gmail.com
+- 📧 **Email**: fa3n20004@gmail.com
 
 ---
 
@@ -479,7 +478,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - ✅ Email notifications
 - ✅ Production deployment ready
 
-<div align="center">
+<div align="left">
   <h3>🚀 Ready to build amazing e-commerce experiences?</h3>
   <p>
     <a href="https://github.com/faizan-ahmad5/e-dukaan-backend/fork">Fork this repo</a> and start building today!
