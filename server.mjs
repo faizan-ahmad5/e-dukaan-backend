@@ -12,6 +12,7 @@ import connectDB from "./config/db.mjs";
 import authRoutes from "./routes/authRoutes.mjs";
 import userRoutes from "./routes/userRoutes.mjs";
 import productRoutes from "./routes/productRoutes.mjs";
+import categoryRoutes from "./routes/categoryRoutes.mjs";
 import imageRoutes from "./routes/imageRoutes.mjs";
 import orderRoutes from "./routes/orderRoutes.mjs";
 import reviewRoutes from "./routes/reviewRoutes.mjs";
@@ -95,6 +96,7 @@ app.get("/", (req, res) => {
       auth: "/api/auth",
       users: "/api/users",
       products: "/api/products",
+      categories: "/api/categories",
       cart: "/api/cart",
       payment: "/api/payment",
       images: "/api/images",
@@ -110,6 +112,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRateLimit, authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/categories", categoryRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/payment", paymentRoute);
 app.use("/api/images", imageRoutes);
