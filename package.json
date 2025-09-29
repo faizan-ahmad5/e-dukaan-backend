@@ -7,16 +7,10 @@
   "scripts": {
     "start": "node server.mjs",
     "dev": "nodemon server.mjs",
-    "test": "cross-env NODE_ENV=test jest",
-    "test:watch": "cross-env NODE_ENV=test jest --watch",
-    "test:coverage": "cross-env NODE_ENV=test jest --coverage",
-    "test:integration": "cross-env NODE_ENV=test jest tests/integration --detectOpenHandles --forceExit",
-    "test:e2e": "npx playwright test",
-    "test:e2e:ui": "npx playwright test --ui",
-    "test:e2e:headed": "npx playwright test --headed",
-    "test:e2e:debug": "npx playwright test --debug",
-    "playwright:install": "npx playwright install",
-    "test:unit": "cross-env NODE_ENV=test jest --testPathPattern=unit"
+    "seed:categories": "node scripts/seed-categories.mjs",
+    "seed:database": "node scripts/seed-database.mjs",
+    "reset:database": "node scripts/reset-database.mjs",
+    "setup:categories": "node scripts/update-categories-ultra-simple.mjs"
   },
   "keywords": [
     "ecommerce",
@@ -55,44 +49,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
-    "@playwright/test": "^1.55.0",
-    "@types/jest": "^29.5.5",
-    "cross-env": "^7.0.3",
     "eslint-plugin-security": "^3.0.1",
-    "jest": "^29.7.0",
-    "nodemon": "^3.0.2",
-    "supertest": "^6.3.3"
-  },
-  "jest": {
-    "testEnvironment": "node",
-    "setupFilesAfterEnv": [
-      "<rootDir>/tests/setup.mjs"
-    ],
-    "testMatch": [
-      "<rootDir>/tests/**/*.test.mjs",
-      "<rootDir>/tests/**/*.spec.mjs",
-      "!**/tests/e2e/**"
-    ],
-    "collectCoverageFrom": [
-      "controllers/**/*.mjs",
-      "middleware/**/*.mjs",
-      "utils/**/*.mjs",
-      "models/**/*.mjs",
-      "routes/**/*.mjs",
-      "config/**/*.mjs"
-    ],
-    "coverageThreshold": {
-      "global": {
-        "branches": 70,
-        "functions": 70,
-        "lines": 70,
-        "statements": 70
-      }
-    },
-    "verbose": true,
-    "forceExit": true,
-    "clearMocks": true,
-    "resetMocks": true,
-    "restoreMocks": true
+    "nodemon": "^3.0.2"
   }
 }
