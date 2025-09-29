@@ -5,8 +5,19 @@
   <p><em>A robust, scalable, and secure e-commerce backend built with modern technologies</em></p>
   
   [![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org/)
-  [![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green.svg)](https://www.mongodb.com/)
-  [![Express.js](https://img.shields.io/badge/Express.js-4.21-blue.svg)](https://expressjs.com/)
+  [![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green.svg)](https://www.mongo### Available Scripts
+
+````bash
+# Development
+npm run dev                    # Start development server with nodemon
+npm start                      # Production server start
+
+# Database Management
+npm run seed:categories        # Seed categories only
+npm run seed:database          # Seed full database with sample data
+npm run reset:database         # Reset database (development only)
+npm run setup:categories       # Setup ultra-simple category structure (Men, Women, Kids)
+```[![Express.js](https://img.shields.io/badge/Express.js-4.21-blue.svg)](https://expressjs.com/)
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 </div>
 
@@ -30,26 +41,28 @@ E-Dukaan is an enterprise-grade e-commerce backend API designed for modern web a
 ## 🏗️ **Architecture**
 
 ````
+
 ┌─────────────────────────────────────────────────────────┐
-│                   Frontend Applications                  │
-│          (React, Vue, Angular, Mobile Apps)             │
+│ Frontend Applications │
+│ (React, Vue, Angular, Mobile Apps) │
 └─────────────────────┬───────────────────────────────────┘
-                      │ REST API Calls
-                      ▼
+│ REST API Calls
+▼
 ┌─────────────────────────────────────────────────────────┐
-│                  E-Dukaan Backend API                   │
+│ E-Dukaan Backend API │
 ├─────────────────────────────────────────────────────────┤
-│  Authentication │ Products │ Orders │ Payments │ Users  │
+│ Auth │ Products │ Categories │ Orders │ Payments │ Users │
 ├─────────────────────────────────────────────────────────┤
-│     Security Middleware │ Validation │ Rate Limiting    │
+│ Security Middleware │ Validation │ Rate Limiting │
 ├─────────────────────────────────────────────────────────┤
-│        Logging │ Monitoring │ Health Checks             │
+│ Logging │ Monitoring │ Health Checks │
 └─────────────────────┬───────────────────────────────────┘
-                      │
-                      ▼
+│
+▼
 ┌─────────────────────────────────────────────────────────┐
-│         MongoDB Atlas │ Stripe │ Email Services         │
+│ MongoDB Atlas │ Stripe │ Email Services │
 └──────────────────────────────────────────────────────────
+
 ---
 
 ## 🚀 **Quick Start**
@@ -76,19 +89,32 @@ cp .env.example .env
 # Configure your environment variables
 # Edit .env file with your MongoDB URI, JWT secret, email settings, etc.
 
-# Seed the database (optional)
-npm run db:seed
+# Setup categories (recommended)
+npm run setup:categories
+
+# Seed the database with sample data (optional)
+npm run seed:database
 
 # Start development server
 npm run dev
 
 # Or start in production mode
 npm start
-````
+```
 
 ---
 
 ## 🏪 **Core Features**
+
+### 🏷️ **Dynamic Category Management** _(NEW)_
+
+- **Flexible Category System**: Database-driven categories instead of fixed enums
+- **Hierarchical Structure**: Parent-child category relationships
+- **SEO-Friendly URLs**: Automatic slug generation for categories
+- **Menu Integration**: Specialized endpoints for navigation menus
+- **Ultra-Simple Setup**: Pre-configured with Men, Women, Kids categories
+- **Admin Management**: Full CRUD operations for category management
+- **Product Association**: Dynamic product-category relationships
 
 ### 🔐 Authentication & Authorization
 
@@ -108,10 +134,22 @@ npm start
 ### 📦 Product Management
 
 - CRUD operations for products
-- Category and subcategory management
+- Advanced category and subcategory management
+- Dynamic category system with hierarchical structure
 - Image upload and processing with Sharp
 - Product search and filtering
 - Inventory management
+- Category-based product organization
+
+### 🏷️ Category Management
+
+- Dynamic category creation and management
+- Hierarchical category structure (parent-child relationships)
+- Category tree navigation
+- Menu-specific category endpoints
+- SEO-friendly category slugs
+- Category-based product filtering
+- Ultra-simple 3-category system (Men, Women, Kids)
 
 ### 🛒 Shopping Cart
 
@@ -190,6 +228,20 @@ DELETE /api/products/:id                # Delete product (Admin)
 PUT    /api/products/:id/images         # Update product images (Admin)
 POST   /api/products/:id/images         # Add product image (Admin)
 DELETE /api/products/:id/images/:imageUrl # Remove product image (Admin)
+```
+
+#### Categories
+
+```bash
+GET    /api/categories                  # Get all categories
+GET    /api/categories/tree             # Get category tree structure
+GET    /api/categories/menu             # Get categories for menu display
+GET    /api/categories/:id              # Get category by ID
+GET    /api/categories/slug/:slug       # Get category by slug
+GET    /api/categories/:id/products     # Get products in category
+POST   /api/categories                  # Create category (Admin)
+PUT    /api/categories/:id              # Update category (Admin)
+DELETE /api/categories/:id              # Delete category (Admin)
 ```
 
 #### Cart & Orders
@@ -299,8 +351,9 @@ DELETE /api/images/:type/:filename  # Delete uploaded image
 NODE_ENV=development
 PORT=5000
 
-# Database
-MONGODB_URI=mongodb://localhost:27017/e_dukaan_dev
+# Database (MongoDB Atlas recommended)
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/e-dukkan
+# or local: mongodb://localhost:27017/e_dukaan_dev
 
 # JWT Configuration
 JWT_SECRET=your_super_secure_jwt_secret_minimum_32_characters
@@ -400,10 +453,15 @@ e-dukaan-backend/
 │   ├── environment.mjs     # Environment validation
 │   └── emailConfig.mjs     # Email service config
 ├── controllers/            # Route controllers
-│   ├── authController.mjs  # Authentication logic
-│   ├── productController.mjs
-│   ├── orderController.mjs
-│   └── ...
+│   ├── authController.mjs     # Authentication logic
+│   ├── productController.mjs  # Product management
+│   ├── categoryController.mjs # NEW: Dynamic categories
+│   ├── cartController.mjs     # Shopping cart logic
+│   ├── orderController.mjs    # Order processing
+│   ├── userController.mjs     # User management
+│   ├── reviewController.mjs   # Product reviews
+│   ├── wishlistController.mjs # Wishlist functionality
+│   └── paymentController.mjs  # Payment processing
 ├── middleware/             # Express middleware
 │   ├── authMiddleware.mjs  # JWT authentication
 │   ├── errorMiddleware.mjs # Error handling
@@ -411,11 +469,22 @@ e-dukaan-backend/
 ├── models/                 # Mongoose schemas
 │   ├── UserSchema.mjs
 │   ├── ProductSchema.mjs
-│   └── ...
+│   ├── CategorySchema.mjs  # NEW: Dynamic categories
+│   ├── CartSchema.mjs
+│   ├── OrderSchema.mjs
+│   ├── ReviewSchema.mjs
+│   └── WishlistSchema.mjs
 ├── routes/                 # API routes
 │   ├── authRoutes.mjs
 │   ├── productRoutes.mjs
-│   └── ...
+│   ├── categoryRoutes.mjs  # NEW: Category management
+│   ├── cartRoutes.mjs
+│   ├── orderRoutes.mjs
+│   ├── userRoutes.mjs
+│   ├── reviewRoutes.mjs
+│   ├── wishlistRoutes.mjs
+│   ├── paymentRoutes.mjs
+│   └── imageRoutes.mjs
 ├── utils/                  # Utility functions
 │   ├── logger.mjs          # Winston logger
 │   ├── emailService.mjs    # Email utilities
@@ -475,9 +544,48 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - ✅ Core e-commerce functionality
 - ✅ Authentication & authorization
+- ✅ **NEW**: Dynamic category management system
+- ✅ **NEW**: Ultra-simple 3-category structure (Men, Women, Kids)
+- ✅ **NEW**: Hierarchical category relationships
+- ✅ **NEW**: SEO-friendly category slugs
+- ✅ **IMPROVED**: Product-category relationships with ObjectId references
+- ✅ **IMPROVED**: Clean, professional UI without emojis
 - ✅ Payment processing with Stripe
 - ✅ Email notifications
 - ✅ Production deployment ready
+- ✅ **CLEANED**: Removed testing dependencies and temporary files
+
+### Recent Updates (September 2025)
+
+#### 🆕 **Dynamic Category System**
+
+- Replaced fixed enum categories with database-driven dynamic categories
+- Added hierarchical parent-child category relationships
+- Implemented category tree structure for better organization
+- Added dedicated category management endpoints
+- SEO-optimized category slugs for better URLs
+
+#### 🎨 **UI/UX Improvements**
+
+- Removed childish emojis from navigation and categories
+- Streamlined professional interface
+- Cleaned category dropdown menus
+- Removed unnecessary navigation clutter
+
+#### 🧹 **Codebase Cleanup**
+
+- Removed all testing dependencies (Jest, Playwright, Supertest)
+- Cleaned up temporary migration and debugging scripts
+- Optimized package.json for production deployment
+- Enhanced .gitignore patterns for better repository management
+- Reduced deployment size by 277+ packages
+
+#### 🔧 **Developer Experience**
+
+- Simplified npm scripts for database management
+- Added comprehensive database seeding scripts
+- Improved environment configuration validation
+- Enhanced error handling and logging
 
 <div align="center">
   <h3>🚀 Ready to build amazing e-commerce experiences?</h3>
