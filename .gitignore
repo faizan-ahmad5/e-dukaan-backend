@@ -16,6 +16,16 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
+# Temporary files and scripts
+scripts/check-*.mjs
+scripts/clean-*.mjs
+scripts/remove-*.mjs
+scripts/migrate-*.mjs
+scripts/update-categories-*.mjs
+!scripts/update-categories-ultra-simple.mjs
+scripts/temp-*.mjs
+scripts/test-*.mjs
+
 # Runtime data
 pids
 *.pid
